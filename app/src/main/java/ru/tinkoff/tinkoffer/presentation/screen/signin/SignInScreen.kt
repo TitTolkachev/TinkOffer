@@ -1,0 +1,161 @@
+package ru.tinkoff.tinkoffer.presentation.screen.signin
+
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import org.koin.androidx.compose.koinViewModel
+import ru.tinkoff.tinkoffer.R
+import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
+import ru.tinkoff.tinkoffer.presentation.common.SnackbarSuccess
+import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
+
+@Composable
+fun SignInScreen(navigateToHome: () -> Unit) {
+
+    val viewModel: SignInViewModel = koinViewModel()
+    val shackBarHostState = remember { SnackbarHostState() }
+    var isSnackBarMessageError by remember { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.navigateToHome.collect {
+            navigateToHome()
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.error.collect {
+            isSnackBarMessageError = true
+            shackBarHostState.showSnackbar(it)
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.success.collect {
+            isSnackBarMessageError = false
+            shackBarHostState.showSnackbar(it)
+        }
+    }
+
+    val uriHandler = LocalUriHandler.current
+    LaunchedEffect(true) {
+        viewModel.link.collect {
+            uriHandler.openUri(it)
+        }
+    }
+
+    Screen(
+        loading = viewModel.loading.collectAsState().value,
+        shackBarHostState = shackBarHostState,
+        isSnackBarMessageError = isSnackBarMessageError,
+
+        onSignInClick = remember { { viewModel.onSignInClick() } },
+    )
+}
+
+@Composable
+private fun Screen(
+    loading: Boolean = false,
+    shackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    isSnackBarMessageError: Boolean? = null,
+
+    onSignInClick: () -> Unit = {},
+) {
+    Scaffold(
+        modifier = Modifier
+            .imePadding()
+            .animateContentSize(),
+        snackbarHost = {
+            SnackbarHost(hostState = shackBarHostState, snackbar = {
+                if (isSnackBarMessageError == false) SnackbarSuccess(it)
+                else SnackbarError(it)
+            })
+        }
+    ) { paddingValues ->
+        Column(
+            Modifier
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.weight(0.5f))
+
+            Image(
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .weight(2f),
+                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+            )
+
+            Column(
+                modifier = Modifier
+                    .defaultMinSize(48.dp)
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                if (loading) {
+                    CircularProgressIndicator()
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(modifier = Modifier.fillMaxWidth(), onClick = onSignInClick) {
+                Text(text = "Войти с Tinkoff")
+                Spacer(modifier = Modifier.width(16.dp))
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.ic_tinkoff_id),
+                    contentDescription = null
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Screen()
+        }
+    }
+}
