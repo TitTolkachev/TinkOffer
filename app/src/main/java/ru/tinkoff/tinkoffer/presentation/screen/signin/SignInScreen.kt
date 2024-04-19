@@ -1,5 +1,9 @@
 package ru.tinkoff.tinkoffer.presentation.screen.signin
 
+import android.content.Context
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -33,7 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +47,7 @@ import ru.tinkoff.tinkoffer.R
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarSuccess
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
+
 
 @Composable
 fun SignInScreen(navigateToHome: () -> Unit) {
@@ -71,10 +76,26 @@ fun SignInScreen(navigateToHome: () -> Unit) {
         }
     }
 
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.link.collect {
-            uriHandler.openUri(it)
+            val customIntent = CustomTabsIntent.Builder()
+                .setDefaultColorSchemeParams(
+                    CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(0xFFDD2D)
+                        .build()
+                )
+                .setColorSchemeParams(
+                    CustomTabsIntent.COLOR_SCHEME_DARK,
+                    CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(0xFFDD2D)
+                        .build()
+                )
+            openCustomTab(
+                context,
+                customIntent.build(),
+                Uri.parse("https://indorsoft.ru")
+            )
         }
     }
 
@@ -85,6 +106,10 @@ fun SignInScreen(navigateToHome: () -> Unit) {
 
         onSignInClick = remember { { viewModel.onSignInClick() } },
     )
+}
+
+fun openCustomTab(context: Context, customTabsIntent: CustomTabsIntent, uri: Uri?) {
+    customTabsIntent.launchUrl(context, uri!!)
 }
 
 @Composable
@@ -159,7 +184,7 @@ private fun Screen(
                     contentDescription = null
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

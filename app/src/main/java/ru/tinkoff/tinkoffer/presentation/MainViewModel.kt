@@ -18,7 +18,7 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
-            val startDestination = if (true) {
+            val startDestination = if (false) {
                 Screen.SignIn
             } else Screen.Home
 

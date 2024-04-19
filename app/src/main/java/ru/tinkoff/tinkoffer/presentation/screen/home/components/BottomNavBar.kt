@@ -18,7 +18,7 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.HomePage
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
-fun BottomNavBar(active: HomePage, onClick: (HomePage) -> Unit) {
+fun BottomNavBar(active: Int, onClick: (Int) -> Unit) {
     NavigationBar {
         listOf(
             HomePage.Main,
@@ -26,11 +26,11 @@ fun BottomNavBar(active: HomePage, onClick: (HomePage) -> Unit) {
             HomePage.ActiveProposals,
             HomePage.AcceptedProposals,
             HomePage.RejectedProposals,
-        ).forEach { item ->
+        ).forEachIndexed { index, item ->
             NavBarItem(
                 item = item,
-                selected = active == item,
-                onClick = remember { { onClick(item) } }
+                selected = active == index,
+                onClick = remember { { onClick(index) } }
             )
         }
     }
@@ -67,7 +67,7 @@ private fun Preview() {
     AppTheme {
         Surface {
             BottomNavBar(
-                active = HomePage.Main,
+                active = 0,
                 onClick = {}
             )
         }

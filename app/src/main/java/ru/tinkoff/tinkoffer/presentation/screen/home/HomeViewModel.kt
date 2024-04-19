@@ -14,13 +14,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
+    private val _selectedIndex: MutableStateFlow<Int> = MutableStateFlow(0)
+    val selectedIndex: StateFlow<Int> = _selectedIndex.asStateFlow()
 
-    private val _activeScreen: MutableStateFlow<HomePage> = MutableStateFlow(START_SCREEN)
-    val activeScreen: StateFlow<HomePage> = _activeScreen.asStateFlow()
-
-    val fabVisible: StateFlow<Boolean> = _activeScreen.map {
+    val fabVisible: StateFlow<Boolean> = _selectedIndex.map {
         when (it) {
-            HomePage.ActiveProposals, HomePage.AcceptedProposals -> true
+            0, 1 -> true
             else -> false
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
@@ -34,31 +33,13 @@ class HomeViewModel : ViewModel() {
         SharingStarted.WhileSubscribed()
     )
 
-    fun onBottomNavItemClick(item: HomePage) {
-        viewModelScope.launch {
-            _bottomNavActions.emit(item.route)
-        }
-    }
-
-    fun onActiveScreenChange(route: String?) {
-        val screen = SCREENS.find { it.route == route } ?: return
-        _activeScreen.update { screen }
+    fun onBottomNavItemClick(index: Int) {
+        _selectedIndex.update { index }
     }
 
     fun onFabClick() {
         viewModelScope.launch {
             _fabActions.emit(Unit)
         }
-    }
-
-    companion object {
-        val START_SCREEN = HomePage.Main
-        val SCREENS = listOf(
-            HomePage.Main,
-            HomePage.NewProposals,
-            HomePage.ActiveProposals,
-            HomePage.AcceptedProposals,
-            HomePage.RejectedProposals,
-        )
     }
 }

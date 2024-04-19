@@ -2,7 +2,9 @@ package ru.tinkoff.tinkoffer.presentation.screen.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -10,9 +12,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.BottomNavBar
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.Fab
@@ -22,33 +25,19 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.pages.NewProposalsPage
 import ru.tinkoff.tinkoffer.presentation.screen.home.pages.ProjectPage
 import ru.tinkoff.tinkoffer.presentation.screen.home.pages.RejectedProposalsPage
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen() {
-
     val viewModel: HomeViewModel = koinViewModel()
-    val navController = rememberNavController()
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val activeScreen by viewModel.activeScreen.collectAsState()
     val fabVisible by viewModel.fabVisible.collectAsState()
+    val pagerState = rememberPagerState(0, 0f) { 5 }
+    val scope = rememberCoroutineScope()
+    val selectedIndex by viewModel.selectedIndex.collectAsState()
 
-    // Bottom Navigation Actions
-    LaunchedEffect(Unit) {
-        viewModel.bottomNavActions.collect { route ->
-            navController.navigate(route) {
-                navController.graph.startDestinationRoute?.let { startRoute ->
-                    popUpTo(startRoute) {
-                        saveState = true
-                    }
-                }
-                launchSingleTop = true
-                restoreState = true
-            }
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect {
+            viewModel.onBottomNavItemClick(it)
         }
-    }
-
-    // Active Screen Handling
-    LaunchedEffect(backStackEntry) {
-        viewModel.onActiveScreenChange(backStackEntry?.destination?.route)
     }
 
     Scaffold(
@@ -61,20 +50,29 @@ fun HomeScreen() {
         },
         bottomBar = {
             BottomNavBar(
-                active = activeScreen,
-                onClick = remember { { viewModel.onBottomNavItemClick(it) } }
+                active = selectedIndex,
+                onClick = remember {
+                    { scope.launch { pagerState.animateScrollToPage(it) } }
+                }
             )
         }
     ) { paddingValues ->
-        Screen()
+        Screen(
+            modifier = Modifier.padding(paddingValues),
+            pagerState = pagerState
+        )
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Screen() {
+private fun Screen(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState,
+) {
     HorizontalPager(
-        state = rememberPagerState(0, 0f) { 5 },
+        modifier = modifier,
+        state = pagerState,
         beyondBoundsPageCount = 4,
     ) { page ->
         when (page) {
