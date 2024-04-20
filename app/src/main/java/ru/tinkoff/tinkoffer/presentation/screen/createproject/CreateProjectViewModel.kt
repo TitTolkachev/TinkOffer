@@ -2,7 +2,6 @@ package ru.tinkoff.tinkoffer.presentation.screen.createproject
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -11,8 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.tinkoff.tinkoffer.data.models.projects.request.CreateProjectDto
+import ru.tinkoff.tinkoffer.data.rest.ProjectRestApi
 
-class CreateProjectViewModel : ViewModel() {
+class CreateProjectViewModel(
+    private val projectRestApi: ProjectRestApi
+) : ViewModel() {
     private val _navigateBack = MutableSharedFlow<Unit>()
     val navigateBack: SharedFlow<Unit> = _navigateBack
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
@@ -26,6 +29,8 @@ class CreateProjectViewModel : ViewModel() {
 
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
+
+
 
     init {
 
@@ -44,11 +49,20 @@ class CreateProjectViewModel : ViewModel() {
         if (_loading.value) return@launch
 
         _loading.update { true }
-        //TODO(Создать новый проект)
-        //TODO(Отправить на бэк запрос о выборе нового активного проекта)
-        delay(1000L)
-        _navigateToProject.emit(Unit)
-        _loading.update { false }
+
+
+        viewModelScope.launch {
+            with(state.value){
+                val model = CreateProjectDto(name, schedule, voices, refreshDays)
+                val response = projectRestApi.createProject(model)
+                if (response.isSuccessful){
+                    _navigateToProject.emit(Unit)
+                    _loading.update { false }
+                } else{
+                    // TODO show snack
+                }
+            }
+        }
     }
 }
 

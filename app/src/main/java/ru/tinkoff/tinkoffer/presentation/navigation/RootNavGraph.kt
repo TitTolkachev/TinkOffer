@@ -47,8 +47,8 @@ fun RootNavGraph(
                         launchSingleTop = true
                     }
                 },
-                navigateToProjectSettings = {
-                    navController.navigate(route = Screen.ProjectSettings.route) {
+                navigateToProjectSettings = { projectId ->
+                    navController.navigate(route = Screen.ProjectSettings.route + "/$projectId") {
                         launchSingleTop = true
                     }
                 },
@@ -103,11 +103,17 @@ fun RootNavGraph(
             )
         }
         composable(
-            route = Screen.ProjectSettings.route,
+            route = Screen.ProjectSettings.route + "/{project_id}",
             enterTransition = { enterTransition() },
             popEnterTransition = { popEnterTransition() },
             exitTransition = { exitTransition() },
             popExitTransition = { popExitTransition() },
+            arguments = listOf(
+                navArgument("project_id") {
+                    type = NavType.StringType
+                    nullable = false
+                }
+            )
         ) {
             ProjectSettingsScreen(
                 navigateBack = { navController.popBackStack() },

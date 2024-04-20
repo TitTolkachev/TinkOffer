@@ -41,7 +41,7 @@ fun ProjectPage(
     activeProjectInfoDto: ProjectInfoDto?,
     countOfProposals: Int,
     voteAvailable: Int,
-    navigateToProjectSettings: () -> Unit = {},
+    navigateToProjectSettings: (String) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -63,7 +63,13 @@ fun ProjectPage(
             if (admin) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = navigateToProjectSettings) {
+                    IconButton(onClick = {
+                        activeProjectInfoDto?.id?.let {
+                            navigateToProjectSettings(
+                                it
+                            )
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Rounded.Settings,
                             contentDescription = null,

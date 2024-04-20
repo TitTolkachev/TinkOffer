@@ -58,7 +58,7 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.pages.RejectedProposalsPage
 @Composable
 fun HomeScreen(
     navigateToProfile: () -> Unit,
-    navigateToProjectSettings: () -> Unit,
+    navigateToProjectSettings: (String) -> Unit,
     navigateToProjectList: () -> Unit,
     navigateToProposal: (ProposalShort) -> Unit,
 ) {
@@ -192,7 +192,7 @@ private fun Screen(
     userId: String,
     activeProjectInfoDto: ProjectInfoDto?,
     proposalsForActiveProject: List<ProposalInListDto>,
-    navigateToProjectSettings: () -> Unit,
+    navigateToProjectSettings: (String) -> Unit,
     navigateToProposal: (ProposalShort) -> Unit,
 ) {
     HorizontalPager(

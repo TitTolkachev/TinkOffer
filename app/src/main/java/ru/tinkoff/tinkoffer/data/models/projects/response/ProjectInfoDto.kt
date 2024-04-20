@@ -8,8 +8,8 @@ data class ProjectInfoDto(
     val id: String,
     val name: String,
     val schedule: String,
-    val votesPerPeriod: Long,
-    val votesRefreshPeriodDays: Long,
+    val votesPerPeriod: Int,
+    val votesRefreshPeriodDays: Int,
     val createdAt: String,
     val users: List<ProjectUserInfoDto>,
 )
