@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.tinkoff.tinkoffer.data.local.PrefsDataStore
 import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInfoDto
+import ru.tinkoff.tinkoffer.data.models.proposals.request.CreateProposalRequest
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.data.rest.CommentRestApi
 import ru.tinkoff.tinkoffer.data.rest.DraftRestApi
@@ -125,9 +126,25 @@ class HomeViewModel(
     fun changeDialogLink(value: String) = _dialogState.update { it?.copy(link = value) }
 
     fun createProposal() = viewModelScope.launch {
-        // TODO
-        _dialogState.update { null }
-        _scrollToIndex.emit(1)
+        viewModelScope.launch {
+            with(dialogState.value) {
+                this?.let {
+                    val createProposalModel =
+                        activeProjectInfo.value?.id?.let { CreateProposalRequest(text, it, link) }
+                    if (createProposalModel != null) {
+                        val response = proposalRestApi.createProposal(createProposalModel)
+                        if (response.isSuccessful) {
+                            _dialogState.update { null }
+                            _scrollToIndex.emit(1)
+                            loadActiveProject()
+                        } else {
+                            // TODO show snack
+                        }
+
+                    }
+                }
+            }
+        }
     }
 
     companion object {
