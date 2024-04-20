@@ -21,11 +21,21 @@ import androidx.compose.ui.unit.dp
 import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
 import ru.tinkoff.tinkoffer.presentation.common.UserShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
+import ru.tinkoff.tinkoffer.presentation.shadowCustom
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
 fun ProposalElement(item: ProposalShort, onClick: () -> Unit = {}) {
-    Card(onClick = onClick) {
+    Card(
+        modifier = Modifier
+            .then(
+                if (!isSystemInDarkTheme()) Modifier.shadowCustom(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    blurRadius = 32.dp,
+                    shapeRadius = 16.dp,
+                ) else Modifier
+            ), onClick = onClick
+    ) {
         Spacer(modifier = Modifier.height(8.dp))
         Row(modifier = Modifier.padding(horizontal = 8.dp)) {
             Icon(

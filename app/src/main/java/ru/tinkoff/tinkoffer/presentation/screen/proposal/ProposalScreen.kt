@@ -94,7 +94,7 @@ private fun Screen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_cancel),
+                            painter = painterResource(id = R.drawable.close),
                             contentDescription = null,
                             tint = Color(0xFF548BF7)
                         )
