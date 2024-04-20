@@ -25,11 +25,8 @@ class HomeViewModel : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
-    private val _fabActions = MutableSharedFlow<Unit>()
-    val fabActions = _fabActions.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
-    private val _bottomNavActions = MutableSharedFlow<String>()
-    val bottomNavActions = _bottomNavActions.shareIn(
+    private val _scrollToIndex = MutableSharedFlow<Int>()
+    val scrollToIndex = _scrollToIndex.shareIn(
         viewModelScope,
         SharingStarted.WhileSubscribed()
     )
@@ -37,13 +34,28 @@ class HomeViewModel : ViewModel() {
     private val _projectInfo = MutableStateFlow<ShortProjectInfo?>(null)
     val projectInfo = _projectInfo.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
+    private val _dialogState = MutableStateFlow<CreateProposalState?>(null)
+    val dialogState = _dialogState.asStateFlow()
+
     fun onBottomNavItemClick(index: Int) {
         _selectedIndex.update { index }
     }
 
-    fun onFabClick() {
-        viewModelScope.launch {
-            _fabActions.emit(Unit)
-        }
+    fun onFabClick() = _dialogState.update { CreateProposalState() }
+
+    fun hideDialog() = _dialogState.update { null }
+
+    fun changeDialogText(value: String) = _dialogState.update { it?.copy(text = value) }
+    fun changeDialogLink(value: String) = _dialogState.update { it?.copy(link = value) }
+
+    fun createProposal() = viewModelScope.launch {
+        // TODO
+        _dialogState.update { null }
+        _scrollToIndex.emit(1)
     }
 }
+
+data class CreateProposalState(
+    val text: String = "",
+    val link: String = "",
+)

@@ -9,6 +9,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +53,11 @@ private fun RowScope.NavBarItem(item: HomePage, selected: Boolean, onClick: () -
         icon = { NavBarIcon(item, selected) },
         label = { NavBarText(item.title) },
         selected = selected,
-        onClick = onClick
+        onClick = onClick,
+        colors = NavigationBarItemDefaults.colors(
+            selectedTextColor = Color(0xFF4A87F8),
+            unselectedTextColor = Color(0xFF6C6C6C)
+        )
     )
 }
 
@@ -70,7 +75,7 @@ private fun NavBarIcon(item: HomePage, selected: Boolean) {
 private fun NavBarText(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.labelSmall
+        style = MaterialTheme.typography.labelSmall,
     )
 }
 

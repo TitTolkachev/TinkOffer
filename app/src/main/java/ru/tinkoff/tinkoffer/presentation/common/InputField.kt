@@ -33,7 +33,7 @@ fun InputField(
         singleLine = singleLine,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
             focusedTextColor = MaterialTheme.colorScheme.onSurface,
             focusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
             focusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
@@ -43,16 +43,16 @@ fun InputField(
             disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
             disabledLabelColor = MaterialTheme.colorScheme.surfaceTint,
 
-            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
             unfocusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
             unfocusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
             unfocusedTrailingIconColor = MaterialTheme.colorScheme.surfaceTint,
 
-            errorTrailingIconColor = MaterialTheme.colorScheme.error,
-            errorLabelColor = MaterialTheme.colorScheme.error,
-
             cursorColor = MaterialTheme.colorScheme.onBackground,
+
+            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
 
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
