@@ -11,5 +11,5 @@ data class CommentDto(
     val user: UserInfoDto,
     val proposalId: String,
     val parentCommentId: String,
-    val createdAt: String,
+    val createdAt: Long,
 )
