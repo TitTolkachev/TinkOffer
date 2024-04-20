@@ -1,5 +1,6 @@
 package ru.tinkoff.tinkoffer.presentation.screen.home.pages
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.ProposalElement
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActiveProposalsPage(
     modifier: Modifier = Modifier,
@@ -27,7 +29,8 @@ fun ActiveProposalsPage(
     ) {
         items(items = proposals, key = { it.id }) { item ->
             ProposalElement(
-                item,
+                modifier = Modifier.animateItemPlacement(),
+                item = item,
                 showVoteButtons = true,
                 onClick = { onProposalClick(item) },
                 onLike = { onLike(item.id) },

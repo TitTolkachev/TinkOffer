@@ -37,6 +37,7 @@ import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
 fun ProposalElement(
+    modifier: Modifier = Modifier,
     item: ProposalInListDto,
     showVoteButtons: Boolean = true,
     onClick: () -> Unit = {},
@@ -45,7 +46,7 @@ fun ProposalElement(
     onCancel: () -> Unit = {}
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .then(
                 if (!isSystemInDarkTheme()) Modifier.shadowCustom(
                     color = MaterialTheme.colorScheme.secondaryContainer,
@@ -157,7 +158,7 @@ private fun Preview() {
     AppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ProposalElement(
-                ProposalInListDto(
+                item = ProposalInListDto(
                     id = "12",
                     text = "Предложение супер крутое",
                     votesFor = 11,
