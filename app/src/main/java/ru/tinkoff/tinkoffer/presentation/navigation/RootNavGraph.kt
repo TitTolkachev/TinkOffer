@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import ru.tinkoff.tinkoffer.presentation.screen.createproject.CreateProjectScreen
 import ru.tinkoff.tinkoffer.presentation.screen.home.HomeScreen
 import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileScreen
 import ru.tinkoff.tinkoffer.presentation.screen.projectlist.ProjectListScreen
@@ -120,7 +121,18 @@ fun RootNavGraph(
             popExitTransition = { popExitTransition() },
         ) {
             ProjectListScreen(
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateToProject = {
+                    navController.navigate(Screen.Home.route) {
+                        launchSingleTop = true
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                navigateToCreateProject = {
+                    navController.navigate(Screen.CreateProject.route) {
+                        launchSingleTop = true
+                    }
+                },
             )
         }
         composable(
@@ -132,6 +144,23 @@ fun RootNavGraph(
         ) {
             ProposalScreen(
                 navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = Screen.CreateProject.route,
+            enterTransition = { enterTransition() },
+            popEnterTransition = { popEnterTransition() },
+            exitTransition = { exitTransition() },
+            popExitTransition = { popExitTransition() },
+        ) {
+            CreateProjectScreen(
+                navigateBack = { navController.popBackStack() },
+                navigateToProject = {
+                    navController.navigate(Screen.Home.route) {
+                        launchSingleTop = true
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
             )
         }
     }

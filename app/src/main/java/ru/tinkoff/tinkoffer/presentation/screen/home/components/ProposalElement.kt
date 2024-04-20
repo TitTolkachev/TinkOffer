@@ -13,6 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,7 +21,6 @@ import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
 import ru.tinkoff.tinkoffer.presentation.common.UserShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
-
 
 @Composable
 fun ProposalElement(item: ProposalShort, onClick: () -> Unit = {}) {
@@ -39,15 +39,15 @@ fun ProposalElement(item: ProposalShort, onClick: () -> Unit = {}) {
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = item.dislikes.toString(),
-                color = MaterialTheme.colorScheme.error,
+                text = "-${item.dislikes}",
+                color = Color.Red,
             )
             Text(
                 text = " / ",
             )
             Text(
-                text = item.likes.toString(),
-                color = MaterialTheme.colorScheme.secondary,
+                text = "+${item.likes}",
+                color = Color.Green,
             )
         }
         Spacer(modifier = Modifier.height(8.dp))

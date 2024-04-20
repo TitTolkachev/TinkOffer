@@ -11,6 +11,7 @@ import ru.tinkoff.tinkoffer.data.local.PrefsDataStore
 import ru.tinkoff.tinkoffer.data.rest.UserRestApi
 import ru.tinkoff.tinkoffer.data.utils.TokenInterceptor
 import ru.tinkoff.tinkoffer.presentation.MainViewModel
+import ru.tinkoff.tinkoffer.presentation.screen.createproject.CreateProjectViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.home.HomeViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.projectlist.ProjectListViewModel
@@ -35,6 +36,7 @@ val appModule = module {
     viewModel { ProjectSettingsViewModel() }
     viewModel { ProposalViewModel() }
     viewModel { ProjectListViewModel() }
+    viewModel { CreateProjectViewModel() }
 
 
     // Rest
@@ -72,7 +74,6 @@ val appModule = module {
     }
 
     single { get<Retrofit>().create(UserRestApi::class.java) }
-
 
 
 }
