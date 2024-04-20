@@ -178,6 +178,13 @@ private fun Screen(
 
                 Row(
                     modifier = Modifier
+                        .then(
+                            if (!isSystemInDarkTheme()) Modifier.shadowCustom(
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                blurRadius = 32.dp,
+                                shapeRadius = 16.dp,
+                            ) else Modifier
+                        )
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface),
                     verticalAlignment = Alignment.CenterVertically,

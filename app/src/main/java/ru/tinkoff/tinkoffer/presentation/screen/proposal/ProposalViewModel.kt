@@ -13,10 +13,6 @@ class ProposalViewModel : ViewModel() {
     val navigateBack: SharedFlow<Unit> = _navigateBack
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    init {
-
-    }
-
     fun navigateBack() = viewModelScope.launch {
         _navigateBack.emit(Unit)
     }
