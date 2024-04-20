@@ -46,7 +46,7 @@ interface ProposalRestApi {
     ): Response<ResponseBody>
 
 
-    @POST("proposals/{proposalId}/vote/cancel-vote")
+    @POST("proposals/{proposalId}/cancel-vote")
     suspend fun cancelVoteForProposal(@Path("proposalId") proposalId: String): Response<ResponseBody>
 
 //    @GET("proposals/projects/{projectId}")

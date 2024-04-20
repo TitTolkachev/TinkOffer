@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class CreateProjectDto(
     val name: String,
     val schedule: String,
-    val votesPerPeriod: Long,
-    val votesRefreshPeriodDays: Long,
+    val votesPerPeriod: Int,
+    val votesRefreshPeriodDays: Int,
 )

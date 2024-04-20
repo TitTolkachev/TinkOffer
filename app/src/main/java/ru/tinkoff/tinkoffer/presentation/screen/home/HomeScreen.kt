@@ -43,7 +43,6 @@ import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInfoDto
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.presentation.common.InputField
-import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.BottomNavBar
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.Fab
@@ -58,9 +57,9 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.pages.RejectedProposalsPage
 @Composable
 fun HomeScreen(
     navigateToProfile: () -> Unit,
-    navigateToProjectSettings: () -> Unit,
+    navigateToProjectSettings: (String) -> Unit,
     navigateToProjectList: () -> Unit,
-    navigateToProposal: (ProposalShort) -> Unit,
+    navigateToProposal: (ProposalInListDto) -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val fabVisible by viewModel.fabVisible.collectAsState()
@@ -71,7 +70,10 @@ fun HomeScreen(
     // Data on screen
     val userId by viewModel.userId.collectAsState()
     val activeProjectInfo by viewModel.activeProjectInfo.collectAsState()
-    val proposalsForActiveProject by viewModel.proposalsForActiveProject.collectAsState()
+    val newProposalsForActiveProject by viewModel.newProposals.collectAsState()
+    val inProgressProposalsForActiveProject by viewModel.inProgressProposals.collectAsState()
+    val acceptedProposalsForActiveProject by viewModel.acceptedProposals.collectAsState()
+    val rejectedProposalsForActiveProject by viewModel.rejectedProposals.collectAsState()
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect {
@@ -177,9 +179,15 @@ fun HomeScreen(
             pagerState = pagerState,
             userId = userId ?: "",
             activeProjectInfoDto = activeProjectInfo,
-            proposalsForActiveProject = proposalsForActiveProject,
+            newProposals = newProposalsForActiveProject,
+            inProgressProposals = inProgressProposalsForActiveProject,
+            acceptedProposals = acceptedProposalsForActiveProject,
+            rejectedProposals = rejectedProposalsForActiveProject,
             navigateToProjectSettings = navigateToProjectSettings,
             navigateToProposal = navigateToProposal,
+            likeProposal = { id -> viewModel.onLikeClick(id) },
+            dislikeProposal = { id -> viewModel.onDislikeClick(id) },
+            onDismissVote = { id -> viewModel.onDismissVoteClick(id) }
         )
     }
 }
@@ -191,9 +199,15 @@ private fun Screen(
     pagerState: PagerState,
     userId: String,
     activeProjectInfoDto: ProjectInfoDto?,
-    proposalsForActiveProject: List<ProposalInListDto>,
-    navigateToProjectSettings: () -> Unit,
-    navigateToProposal: (ProposalShort) -> Unit,
+    newProposals: List<ProposalInListDto>,
+    inProgressProposals: List<ProposalInListDto>,
+    acceptedProposals: List<ProposalInListDto>,
+    rejectedProposals: List<ProposalInListDto>,
+    navigateToProjectSettings: (String) -> Unit,
+    navigateToProposal: (ProposalInListDto) -> Unit,
+    likeProposal: (id: String) -> Unit,
+    dislikeProposal: (id: String) -> Unit,
+    onDismissVote: (id: String) -> Unit,
 ) {
     HorizontalPager(
         modifier = modifier,
@@ -204,30 +218,50 @@ private fun Screen(
             0 -> {
                 ProjectPage(
                     admin = true,
+                    newProposalsCount = newProposals.size,
+                    inProgressProposalsCount = inProgressProposals.size,
+                    acceptedProposalsCount = acceptedProposals.size,
+                    rejectedProposalsCount = rejectedProposals.size,
                     navigateToProjectSettings = navigateToProjectSettings,
                     activeProjectInfoDto = activeProjectInfoDto,
-                    countOfProposals = proposalsForActiveProject.size,
+                    countOfProposals = newProposals.size + inProgressProposals.size + acceptedProposals.size + rejectedProposals.size,
                     voteAvailable = activeProjectInfoDto?.users?.firstOrNull { it.id == userId }?.availableVotes?.toInt()
                         ?: 0,
                 )
             }
 
             1 -> {
-                NewProposalsPage()
+                NewProposalsPage(
+                    proposals = newProposals,
+                    onProposalClick = navigateToProposal,
+                    onLike = likeProposal,
+                    onDislike = dislikeProposal,
+                    onCancel = onDismissVote
+                )
             }
 
             2 -> {
                 ActiveProposalsPage(
-                    onProposalClick = navigateToProposal
+                    proposals = inProgressProposals,
+                    onProposalClick = navigateToProposal,
+                    onLike = likeProposal,
+                    onDislike = dislikeProposal,
+                    onCancel = onDismissVote
                 )
             }
 
             3 -> {
-                AcceptedProposalsPage()
+                AcceptedProposalsPage(
+                    proposals = acceptedProposals,
+                    onProposalClick = navigateToProposal
+                )
             }
 
             4 -> {
-                RejectedProposalsPage()
+                RejectedProposalsPage(
+                    proposals = rejectedProposals,
+                    onProposalClick = navigateToProposal
+                )
             }
         }
     }

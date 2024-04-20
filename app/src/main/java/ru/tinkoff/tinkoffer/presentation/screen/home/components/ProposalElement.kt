@@ -28,18 +28,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.tinkoff.tinkoffer.R
-import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
-import ru.tinkoff.tinkoffer.presentation.common.UserShort
+import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
+import ru.tinkoff.tinkoffer.data.models.users.response.UserDto
+import ru.tinkoff.tinkoffer.presentation.common.ProposalStatus
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.shadowCustom
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
 fun ProposalElement(
-    item: ProposalShort,
+    item: ProposalInListDto,
+    showVoteButtons: Boolean = true,
     onClick: () -> Unit = {},
     onLike: () -> Unit = {},
     onDislike: () -> Unit = {},
+    onCancel: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -60,65 +63,83 @@ fun ProposalElement(
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(27.dp),
-                painter = painterResource(id = avatars[item.user.avatar]),
+                painter = painterResource(id = avatars[item.user.avatarNumber]),
                 contentDescription = null,
                 tint = Color.Unspecified,
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(
-                modifier = Modifier.weight(1f),
-                text = item.user.nickname,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            with(item.user) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = (firstName ?: "") + " " + (lastName ?: ""),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
 
             Text(
-                text = "-${item.dislikes}",
+                text = "-${item.votesAgainst}",
                 color = if (isSystemInDarkTheme()) Color.White else Color(0xFF3F3F3F),
             )
             Text(
                 text = " | ",
             )
             Text(
-                text = "+${item.likes}",
+                text = "+${item.votesFor}",
                 color = if (isSystemInDarkTheme()) Color(0xFFFEDD2D) else Color(0xFF4A87F8),
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            IconButton(onClick = onLike) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_thumb_up),
-                    contentDescription = null,
-                    tint = if (item.voice == true && isSystemInDarkTheme()) {
-                        Color(0xFFFEDD2D)
-                    } else if (item.voice == true && !isSystemInDarkTheme()) {
-                        Color(0xFF4A87F8)
-                    } else if (isSystemInDarkTheme()) {
-                        Color.White
+            if (showVoteButtons) {
+                IconButton(onClick = {
+                    if (item.userVote == true) {
+                        onCancel()
                     } else {
-                        Color(0xFFA0A0A0)
+                        onLike()
                     }
-                )
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_thumb_up),
+                        contentDescription = null,
+                        tint = if (item.userVote == true && isSystemInDarkTheme()) {
+                            Color(0xFFFEDD2D)
+                        } else if (item.userVote == true && !isSystemInDarkTheme()) {
+                            Color(0xFF4A87F8)
+                        } else if (isSystemInDarkTheme()) {
+                            Color.White
+                        } else {
+                            Color(0xFFA0A0A0)
+                        }
+                    )
+                }
+
+                IconButton(onClick = {
+                    if (item.userVote == false) {
+                        onCancel()
+                    } else {
+                        onDislike()
+                    }
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_thumb_down),
+                        contentDescription = null,
+                        tint = if (item.userVote == false && isSystemInDarkTheme()) {
+                            Color(0xFFFEDD2D)
+                        } else if (item.userVote == false && !isSystemInDarkTheme()) {
+                            Color(0xFF4A87F8)
+                        } else if (isSystemInDarkTheme()) {
+                            Color.White
+                        } else {
+                            Color(0xFFA0A0A0)
+                        }
+                    )
+                }
             }
 
-            IconButton(onClick = onDislike) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_thumb_down),
-                    contentDescription = null,
-                    tint = if (item.voice == false && isSystemInDarkTheme()) {
-                        Color(0xFFFEDD2D)
-                    } else if (item.voice == false && !isSystemInDarkTheme()) {
-                        Color(0xFF4A87F8)
-                    } else if (isSystemInDarkTheme()) {
-                        Color.White
-                    } else {
-                        Color(0xFFA0A0A0)
-                    }
-                )
-            }
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -136,12 +157,15 @@ private fun Preview() {
     AppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ProposalElement(
-                ProposalShort(
+                ProposalInListDto(
                     id = "12",
                     text = "Предложение супер крутое",
-                    likes = 11,
-                    dislikes = 123,
-                    user = UserShort(id = "4", avatar = 1, nickname = "Android"),
+                    votesFor = 11,
+                    votesAgainst = 123,
+                    user = UserDto(id = "4", avatarNumber = 1, firstName = "Android"),
+                    userVote = null,
+                    createdAt = 1713645386,
+                    proposalStatus = ProposalStatus.ACCEPTED
                 )
             )
         }

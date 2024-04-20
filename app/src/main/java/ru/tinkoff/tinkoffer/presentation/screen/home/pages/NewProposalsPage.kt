@@ -1,17 +1,41 @@
 package ru.tinkoff.tinkoffer.presentation.screen.home.pages
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
+import ru.tinkoff.tinkoffer.presentation.screen.home.components.ProposalElement
 
 @Composable
 fun NewProposalsPage(
     modifier: Modifier = Modifier,
+    proposals: List<ProposalInListDto>,
+    onProposalClick: (ProposalInListDto) -> Unit,
+    onLike: (id: String) -> Unit,
+    onDislike: (id: String) -> Unit,
+    onCancel: (id: String) -> Unit
+
 ) {
-    Box(modifier.fillMaxSize()) {
-        Text(modifier = Modifier.align(Alignment.Center), text = "NewProposalsPage")
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.Absolute.spacedBy(8.dp),
+    ) {
+        items(items = proposals, key = { it.id }) { item ->
+            ProposalElement(
+                item,
+                showVoteButtons = true,
+                onClick = { onProposalClick(item) },
+                onLike = { onLike(item.id) },
+                onDislike = { onDislike(item.id) },
+                onCancel = { onCancel(item.id) }
+
+            )
+        }
     }
 }

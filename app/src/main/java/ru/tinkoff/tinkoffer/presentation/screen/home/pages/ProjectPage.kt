@@ -38,10 +38,15 @@ fun ProjectPage(
     modifier: Modifier = Modifier,
     admin: Boolean,
 
+    newProposalsCount: Int,
+    inProgressProposalsCount: Int,
+    acceptedProposalsCount: Int,
+    rejectedProposalsCount: Int,
+
     activeProjectInfoDto: ProjectInfoDto?,
     countOfProposals: Int,
     voteAvailable: Int,
-    navigateToProjectSettings: () -> Unit = {},
+    navigateToProjectSettings: (String) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -63,7 +68,13 @@ fun ProjectPage(
             if (admin) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = navigateToProjectSettings) {
+                    IconButton(onClick = {
+                        activeProjectInfoDto?.id?.let {
+                            navigateToProjectSettings(
+                                it
+                            )
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Rounded.Settings,
                             contentDescription = null,
@@ -101,14 +112,24 @@ fun ProjectPage(
                 .weight(1f)
                 .padding(horizontal = 16.dp)
         ) {
-            ProjectPieChart()
+            ProjectPieChart(
+                newProposalsCount = newProposalsCount,
+                inProgressProposalsCount = inProgressProposalsCount,
+                acceptedProposalsCount = acceptedProposalsCount,
+                rejectedProposalsCount = rejectedProposalsCount,
+            )
 
         }
     }
 }
 
 @Composable
-private fun ProjectPieChart() {
+private fun ProjectPieChart(
+    newProposalsCount: Int,
+    inProgressProposalsCount: Int,
+    acceptedProposalsCount: Int,
+    rejectedProposalsCount: Int,
+) {
     AndroidView(
         modifier = Modifier
             .fillMaxSize(),
@@ -118,7 +139,7 @@ private fun ProjectPieChart() {
             pieChart.setUsePercentValues(true)
             pieChart.setEntryLabelTextSize(12f)
             pieChart.setEntryLabelColor(Color.BLACK)
-            pieChart.centerText = "Вклад в проект"
+            pieChart.centerText = "Статистика предложений"
             pieChart.setCenterTextSize(24f)
             pieChart.description.isEnabled = false
 
@@ -130,13 +151,21 @@ private fun ProjectPieChart() {
             pieChart
         },
     ) { pieChart ->
-        val pieEntries = listOf(
-            PieEntry(0.2f, "Лёня"),
-            PieEntry(0.2f, "Тит"),
-            PieEntry(0.2f, "Полина"),
-            PieEntry(0.1f, "Максим"),
-            PieEntry(0.3f, "Дима"),
-        )
+        val all =
+            newProposalsCount + inProgressProposalsCount + acceptedProposalsCount + rejectedProposalsCount
+        val pieEntries = mutableListOf<PieEntry>()
+        if (newProposalsCount > 0) {
+            pieEntries.add(PieEntry(newProposalsCount.toFloat() / all, "Новые"))
+        }
+        if (inProgressProposalsCount > 0) {
+            pieEntries.add(PieEntry(inProgressProposalsCount.toFloat() / all, "Активные"))
+        }
+        if (acceptedProposalsCount > 0) {
+            pieEntries.add(PieEntry(acceptedProposalsCount.toFloat() / all, "Принятые"))
+        }
+        if (rejectedProposalsCount > 0) {
+            pieEntries.add(PieEntry(rejectedProposalsCount.toFloat() / all, "Отклонённые"))
+        }
 
         val colors = ArrayList<Int>()
         for (color in ColorTemplate.MATERIAL_COLORS) {
@@ -151,8 +180,10 @@ private fun ProjectPieChart() {
         pieDataset.colors = colors
         pieDataset.valueTextSize = 15f
         pieDataset.sliceSpace = 5f
+        pieDataset.setDrawValues(false)
 
-        pieChart.data = PieData(pieDataset)
+        val pieData = PieData(pieDataset)
+        pieChart.data = pieData
     }
 }
 
@@ -166,7 +197,11 @@ private fun Preview() {
                 admin = true,
                 activeProjectInfoDto = null,
                 countOfProposals = 100,
-                voteAvailable = 100
+                voteAvailable = 100,
+                newProposalsCount = 5,
+                inProgressProposalsCount = 10,
+                acceptedProposalsCount = 3,
+                rejectedProposalsCount = 2,
             )
         }
     }
