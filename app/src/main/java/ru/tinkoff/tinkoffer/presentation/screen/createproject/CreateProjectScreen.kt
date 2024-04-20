@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -17,7 +18,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.R
+import ru.tinkoff.tinkoffer.presentation.common.InputField
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
@@ -61,6 +62,10 @@ fun CreateProjectScreen(
         state = state,
         shackBarHostState = shackBarHostState,
 
+        changeName = remember { { viewModel.changeName(it) } },
+        changeSchedule = remember { { viewModel.changeSchedule(it) } },
+        changeVoices = remember { { viewModel.changeVoices(it.toIntOrNull() ?: 0) } },
+        changeRefreshDays = remember { { viewModel.changeRefreshDays(it.toIntOrNull() ?: 0) } },
         onBackClick = remember { { viewModel.navigateBack() } },
     )
 }
@@ -72,9 +77,9 @@ private fun Screen(
     shackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
     changeName: (String) -> Unit = {},
-    changeSchedule: () -> Unit = {},
-    changeVoices: () -> Unit = {},
-    changeRefreshDays: () -> Unit = {},
+    changeSchedule: (String) -> Unit = {},
+    changeVoices: (String) -> Unit = {},
+    changeRefreshDays: (String) -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {
     Scaffold(
@@ -115,10 +120,11 @@ private fun Screen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            TextField(
+            InputField(
+                modifier = Modifier.fillMaxWidth(),
                 value = state.name,
                 onValueChange = changeName,
-                label = { Text(text = "Название") },
+                placeholder = "Название",
             )
         }
     }

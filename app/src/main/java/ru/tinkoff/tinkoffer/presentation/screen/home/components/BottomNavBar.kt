@@ -49,7 +49,7 @@ fun BottomNavBar(active: Int, onClick: (Int) -> Unit) {
 @Composable
 private fun RowScope.NavBarItem(item: HomePage, selected: Boolean, onClick: () -> Unit) {
     NavigationBarItem(
-        icon = { NavBarIcon(item) },
+        icon = { NavBarIcon(item, selected) },
         label = { NavBarText(item.title) },
         selected = selected,
         onClick = onClick
@@ -57,10 +57,10 @@ private fun RowScope.NavBarItem(item: HomePage, selected: Boolean, onClick: () -
 }
 
 @Composable
-private fun NavBarIcon(item: HomePage) {
+private fun NavBarIcon(item: HomePage, selected: Boolean) {
     Icon(
-        modifier = Modifier.size(24.dp),
-        painter = painterResource(id = item.icon),
+        modifier = Modifier.size(32.dp),
+        painter = if (selected) painterResource(id = item.darkIcon) else painterResource(id = item.icon),
         tint = Color.Unspecified,
         contentDescription = item.title
     )

@@ -1,5 +1,6 @@
 package ru.tinkoff.tinkoffer.presentation.screen.projectlist.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +20,21 @@ import androidx.compose.ui.unit.dp
 import ru.tinkoff.tinkoffer.R
 import ru.tinkoff.tinkoffer.presentation.common.ProjectShort
 import ru.tinkoff.tinkoffer.presentation.fromEpochDate
+import ru.tinkoff.tinkoffer.presentation.shadowCustom
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
 fun ProjectItem(item: ProjectShort, onClick: () -> Unit) {
-    Card(onClick = onClick) {
+    Card(
+        modifier = Modifier
+            .then(
+                if (!isSystemInDarkTheme()) Modifier.shadowCustom(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    blurRadius = 32.dp,
+                    shapeRadius = 16.dp,
+                ) else Modifier
+            ), onClick = onClick
+    ) {
         Row(
             modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically

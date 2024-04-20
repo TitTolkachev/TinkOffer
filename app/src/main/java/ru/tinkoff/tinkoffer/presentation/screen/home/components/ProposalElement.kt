@@ -1,5 +1,6 @@
 package ru.tinkoff.tinkoffer.presentation.screen.home.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -40,14 +41,14 @@ fun ProposalElement(item: ProposalShort, onClick: () -> Unit = {}) {
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "-${item.dislikes}",
-                color = Color.Red,
+                color = if (isSystemInDarkTheme()) Color(0xFFD32524) else Color(0xFFE64353),
             )
             Text(
                 text = " / ",
             )
             Text(
                 text = "+${item.likes}",
-                color = Color.Green,
+                color = if (isSystemInDarkTheme()) Color(0xFF06951E) else Color(0xFF2AC756),
             )
         }
         Spacer(modifier = Modifier.height(8.dp))

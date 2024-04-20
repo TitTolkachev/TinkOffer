@@ -2,16 +2,21 @@ package ru.tinkoff.tinkoffer.presentation.screen.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,7 +71,10 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             Row(
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp),
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(vertical = 16.dp, horizontal = 24.dp)
+                    .windowInsetsPadding(WindowInsets.statusBars),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SelectProjectElement(
@@ -88,6 +96,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             Fab(
+                text = "Предложение",
                 visible = fabVisible,
                 onClick = remember { { viewModel.onFabClick() } }
             )

@@ -1,6 +1,7 @@
 package ru.tinkoff.tinkoffer.presentation.screen.home.pages
 
 import android.graphics.Color
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
+import ru.tinkoff.tinkoffer.presentation.shadowCustom
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
@@ -43,7 +45,17 @@ fun ProjectPage(
             .verticalScroll(rememberScrollState()),
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-        Card(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Card(
+            modifier = Modifier
+                .then(
+                    if (!isSystemInDarkTheme()) Modifier.shadowCustom(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        blurRadius = 32.dp,
+                        shapeRadius = 16.dp,
+                    ) else Modifier
+                )
+                .padding(horizontal = 16.dp)
+        ) {
             if (admin) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
