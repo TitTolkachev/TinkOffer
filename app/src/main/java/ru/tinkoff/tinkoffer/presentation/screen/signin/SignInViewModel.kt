@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -14,9 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.tinkoff.tinkoffer.data.local.PrefsDataStore
+import ru.tinkoff.tinkoffer.data.models.users.requests.SingInRequest
+import ru.tinkoff.tinkoffer.data.rest.UserRestApi
 
 class SignInViewModel(
     savedStateHandle: SavedStateHandle,
+    userRestApi: UserRestApi,
+    prefsDataStore: PrefsDataStore
 ) : ViewModel() {
     private val _navigateToHome = MutableSharedFlow<Unit>()
     val navigateToHome: SharedFlow<Unit> = _navigateToHome
@@ -38,15 +42,24 @@ class SignInViewModel(
 
     init {
         if (_token != null) {
+            Log.d(TAG, _token.toString())
             viewModelScope.launch {
                 _loading.update { true }
 
                 try {
-                    //TODO(Отправить запрос на бэк)
-                    Log.d("TEST", "TOKEN: $_token")
-                    delay(1000L)
-                    _navigateToHome.emit(Unit)
-                } catch (_: Exception) {
+                    val model = SingInRequest(_token)
+                    val response = userRestApi.singIn(model)
+                    Log.d(TAG, response.toString())
+
+                    if (response.isSuccessful) {
+                        prefsDataStore.updateTokens(response.body()?.accessToken)
+                        _navigateToHome.emit(Unit)
+                    } else {
+                        _error.emit(response.errorBody().toString())
+                    }
+                } catch (e: Exception) {
+                    Log.d(TAG, e.stackTraceToString())
+
                     _error.emit("Не удалось войти")
                 }
 
@@ -57,5 +70,9 @@ class SignInViewModel(
 
     fun onSignInClick() = viewModelScope.launch {
         _link.emit("http://79.174.91.149/?redirect_url=tinkoffer://sign-in")
+    }
+
+    companion object{
+        private val TAG = SignInViewModel::class.simpleName
     }
 }

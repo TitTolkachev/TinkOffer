@@ -3,6 +3,7 @@ agp = "8.3.2"
 annotationsApi = "6.0.53"
 browser = "1.8.0"
 coilCompose = "2.5.0"
+converterGson = "2.9.0"
 coreSplashscreen = "1.0.1"
 datastorePreferences = "1.1.0"
 firebaseBom = "32.8.1"
@@ -49,6 +50,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 annotations-api = { module = "org.apache.tomcat:annotations-api", version.ref = "annotationsApi" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 grpc-okhttp = { module = "io.grpc:grpc-okhttp", version.ref = "grpcOkhttp" }
