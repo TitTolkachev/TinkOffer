@@ -2,17 +2,28 @@ package ru.tinkoff.tinkoffer.presentation.screen.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,8 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import ru.tinkoff.tinkoffer.presentation.common.InputField
 import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.BottomNavBar
@@ -62,11 +75,64 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(true) {
+        viewModel.scrollToIndex.collect {
+            scope.launch {
+                pagerState.animateScrollToPage(it)
+            }
+        }
+    }
+
+    val dialogState by viewModel.dialogState.collectAsState()
+    if (dialogState != null) {
+        Dialog(onDismissRequest = remember { { viewModel.hideDialog() } }) {
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp)
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "Новое предложение",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                InputField(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .heightIn(0.dp, 200.dp),
+                    value = dialogState?.text ?: "",
+                    onValueChange = remember { { viewModel.changeDialogText(it) } },
+                    singleLine = false,
+                    placeholder = "Текст..."
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                InputField(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    value = dialogState?.link ?: "",
+                    onValueChange = remember { { viewModel.changeDialogLink(it) } },
+                    placeholder = "Ссылка"
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    modifier = Modifier.align(Alignment.End),
+                    onClick = remember { { viewModel.createProposal() } },
+                ) {
+                    Text(text = "Создать")
+                }
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             Row(
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp),
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(vertical = 16.dp, horizontal = 24.dp)
+                    .windowInsetsPadding(WindowInsets.statusBars),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SelectProjectElement(
@@ -88,6 +154,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             Fab(
+                text = "Предложение",
                 visible = fabVisible,
                 onClick = remember { { viewModel.onFabClick() } }
             )
