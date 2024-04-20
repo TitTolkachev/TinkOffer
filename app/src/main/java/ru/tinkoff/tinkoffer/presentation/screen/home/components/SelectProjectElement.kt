@@ -1,5 +1,7 @@
 package ru.tinkoff.tinkoffer.presentation.screen.home.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -42,7 +45,15 @@ fun SelectProjectElement(
     ) {
 
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable(
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
+                indication = null
+            ) {
+                onChangeProjectClick()
+            }
         ) {
             Text(
                 text = projectInfo?.name ?: "Проект не выбран",
@@ -52,13 +63,11 @@ fun SelectProjectElement(
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp
             )
-            IconButton(onClick = onChangeProjectClick) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
-            }
         }
 
         if (projectInfo == null) {
@@ -74,12 +83,8 @@ fun SelectProjectElement(
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(text = numberOfPeople.toString(), fontSize = 14.sp)
                 }
-
             }
-
         }
-
-
     }
 }
 
