@@ -1,14 +1,18 @@
 package ru.tinkoff.tinkoffer.presentation.screen.home.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -38,27 +42,34 @@ fun BottomNavBar(active: Int, onClick: (Int) -> Unit) {
 
 @Composable
 private fun RowScope.NavBarItem(item: HomePage, selected: Boolean, onClick: () -> Unit) {
-    NavigationBarItem(
-        selected = selected,
-        onClick = onClick,
-        icon = { NavBarIcon(item, selected) },
-        label = { NavBarText(item.title) },
-    )
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .clickable { onClick() },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+    ) {
+        NavBarIcon(item)
+        NavBarText(item.title)
+    }
 }
 
 @Composable
-private fun NavBarIcon(item: HomePage, selected: Boolean) {
+private fun NavBarIcon(item: HomePage) {
     Icon(
         modifier = Modifier.size(24.dp),
         painter = painterResource(id = item.icon),
-        tint = if (selected) Color(0xFF396BBB) else Color(0xFF7F838D),
+        tint = Color.Unspecified,
         contentDescription = item.title
     )
 }
 
 @Composable
 private fun NavBarText(text: String) {
-    Text(text = text)
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall
+    )
 }
 
 @Preview
