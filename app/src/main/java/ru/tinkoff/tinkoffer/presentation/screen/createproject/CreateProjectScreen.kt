@@ -6,9 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
@@ -59,6 +64,7 @@ fun CreateProjectScreen(
     }
 
     Screen(
+        loading = viewModel.loading.collectAsState().value,
         state = state,
         shackBarHostState = shackBarHostState,
 
@@ -66,6 +72,7 @@ fun CreateProjectScreen(
         changeSchedule = remember { { viewModel.changeSchedule(it) } },
         changeVoices = remember { { viewModel.changeVoices(it.toIntOrNull() ?: 0) } },
         changeRefreshDays = remember { { viewModel.changeRefreshDays(it.toIntOrNull() ?: 0) } },
+        create = remember { { viewModel.create() } },
         onBackClick = remember { { viewModel.navigateBack() } },
     )
 }
@@ -73,6 +80,7 @@ fun CreateProjectScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Screen(
+    loading: Boolean,
     state: CreateProjectState,
     shackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
@@ -80,6 +88,7 @@ private fun Screen(
     changeSchedule: (String) -> Unit = {},
     changeVoices: (String) -> Unit = {},
     changeRefreshDays: (String) -> Unit = {},
+    create: () -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {
     Scaffold(
@@ -118,14 +127,55 @@ private fun Screen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
                 .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = "Название")
             InputField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.name,
                 onValueChange = changeName,
-                placeholder = "Название",
             )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = "Ближайшая встреча")
+            InputField(
+                modifier = Modifier.fillMaxWidth(),
+                value = state.schedule,
+                onValueChange = changeSchedule,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = "Лимит голосов")
+            InputField(
+                modifier = Modifier.fillMaxWidth(),
+                value = state.voices.toString(),
+                onValueChange = changeVoices,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = "Частота пополнений голосов, дн")
+            InputField(
+                modifier = Modifier.fillMaxWidth(),
+                value = state.refreshDays.toString(),
+                onValueChange = changeRefreshDays,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = create
+            ) {
+                Text(text = "Создать")
+            }
+
+            if (loading) {
+                Spacer(modifier = Modifier.height(16.dp))
+                CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+            }
         }
     }
 }
@@ -135,7 +185,7 @@ private fun Screen(
 private fun Preview() {
     AppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            Screen(state = CreateProjectState())
+            Screen(loading = false, state = CreateProjectState())
         }
     }
 }

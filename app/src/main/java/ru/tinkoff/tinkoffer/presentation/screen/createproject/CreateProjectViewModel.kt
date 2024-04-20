@@ -2,6 +2,7 @@ package ru.tinkoff.tinkoffer.presentation.screen.createproject
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,6 +24,9 @@ class CreateProjectViewModel : ViewModel() {
     private val _state = MutableStateFlow(CreateProjectState())
     val state = _state.asStateFlow()
 
+    private val _loading = MutableStateFlow(false)
+    val loading = _loading.asStateFlow()
+
     init {
 
     }
@@ -34,6 +38,17 @@ class CreateProjectViewModel : ViewModel() {
 
     fun navigateBack() = viewModelScope.launch {
         _navigateBack.emit(Unit)
+    }
+
+    fun create() = viewModelScope.launch {
+        if (_loading.value) return@launch
+
+        _loading.update { true }
+        //TODO(Создать новый проект)
+        //TODO(Отправить на бэк запрос о выборе нового активного проекта)
+        delay(1000L)
+        _navigateToProject.emit(Unit)
+        _loading.update { false }
     }
 }
 

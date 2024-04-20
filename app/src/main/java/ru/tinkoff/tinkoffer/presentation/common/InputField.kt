@@ -1,6 +1,7 @@
 package ru.tinkoff.tinkoffer.presentation.common
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,6 +21,7 @@ fun InputField(
     onValueChange: (String) -> Unit,
     placeholder: String? = null,
     singleLine: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     TextField(
         modifier = modifier,
@@ -57,7 +59,8 @@ fun InputField(
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-        )
+        ),
+        keyboardOptions = keyboardOptions,
     )
 }
 
