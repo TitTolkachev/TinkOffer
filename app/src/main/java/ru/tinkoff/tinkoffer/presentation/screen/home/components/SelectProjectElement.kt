@@ -26,12 +26,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.tinkoff.tinkoffer.R
-import ru.tinkoff.tinkoffer.data.models.ShortProjectInfo
+import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInfoDto
+import ru.tinkoff.tinkoffer.data.models.users.response.ProjectUserInfoDto
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
 fun SelectProjectElement(
-    projectInfo: ShortProjectInfo? = null,
+    projectInfo: ProjectInfoDto? = null,
     onChangeProjectClick: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
@@ -76,7 +77,7 @@ fun SelectProjectElement(
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.size(8.dp))
-                    Text(text = numberOfPeople.toString(), fontSize = 14.sp)
+                    Text(text = projectInfo.users.size.toString(), fontSize = 14.sp)
                 }
             }
         }
@@ -86,22 +87,40 @@ fun SelectProjectElement(
 @Preview
 @Composable
 private fun Preview() {
+    val user = ProjectUserInfoDto(
+        "String",
+        "String",
+        "String",
+        "String",
+        "String",
+        1,
+        1,
+        false
+    )
     AppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             Column {
                 SelectProjectElement(
-                    ShortProjectInfo(
+                    ProjectInfoDto(
                         "",
                         "Великолепный проект",
+                        "",
                         10,
+                        10,
+                        "01.01.10",
+                        listOf(user, user, user, user, user),
                     ),
                     {}
                 )
                 SelectProjectElement(
-                    ShortProjectInfo(
+                    ProjectInfoDto(
                         "",
-                        "Очень длинное название проекта",
+                        "Великолепный проект",
+                        "",
                         10,
+                        10,
+                        "01.01.10",
+                        listOf(user, user, user, user, user),
                     ),
                     {}
                 )

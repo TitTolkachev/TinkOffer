@@ -23,6 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.R
-import ru.tinkoff.tinkoffer.presentation.common.ProjectShort
+import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInListDto
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.common.projects
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.Fab
@@ -47,6 +49,8 @@ fun ProjectListScreen(
 ) {
     val viewModel: ProjectListViewModel = koinViewModel()
     val shackBarHostState = remember { SnackbarHostState() }
+
+    val availableProjects by viewModel.availableProjects.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.navigateBack.collect {
@@ -67,7 +71,7 @@ fun ProjectListScreen(
     }
 
     Screen(
-        items = projects,
+        items = availableProjects,
         shackBarHostState = shackBarHostState,
 
         onProjectClick = remember { { viewModel.onProjectClick(it) } },
@@ -79,10 +83,10 @@ fun ProjectListScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Screen(
-    items: List<ProjectShort>,
+    items: List<ProjectInListDto>,
     shackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
-    onProjectClick: (ProjectShort) -> Unit = {},
+    onProjectClick: (ProjectInListDto) -> Unit = {},
     onFabClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {

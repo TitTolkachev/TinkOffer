@@ -70,9 +70,8 @@ interface ProjectRestApi {
         @Path("projectId") projectId: String,
     ): Response<List<ProposalInListDto>>
 
-    @GET("projects/{id}/active")
+    @GET("projects/active")
     suspend fun getActiveProject(
-        @Path("id") projectId: String,
     ): Response<ActiveProjectDto>
 
     @DELETE("projects/{id}/users")

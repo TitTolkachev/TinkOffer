@@ -35,11 +35,11 @@ val appModule = module {
     // ViewModel
     viewModel { MainViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get()) }
-    viewModel { HomeViewModel() }
+    viewModel { HomeViewModel(get(),get(),get(),get(),get(),get(),) }
     viewModel { ProfileViewModel() }
     viewModel { ProjectSettingsViewModel() }
     viewModel { ProposalViewModel() }
-    viewModel { ProjectListViewModel() }
+    viewModel { ProjectListViewModel(get()) }
     viewModel { CreateProjectViewModel() }
 
 

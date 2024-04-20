@@ -18,13 +18,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.tinkoff.tinkoffer.R
-import ru.tinkoff.tinkoffer.presentation.common.ProjectShort
+import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInListDto
 import ru.tinkoff.tinkoffer.presentation.fromEpochDate
 import ru.tinkoff.tinkoffer.presentation.shadowCustom
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
-fun ProjectItem(item: ProjectShort, onClick: () -> Unit) {
+fun ProjectItem(item: ProjectInListDto, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .then(
@@ -45,12 +45,12 @@ fun ProjectItem(item: ProjectShort, onClick: () -> Unit) {
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = fromEpochDate(item.creationDate) ?: "",
+                    text = fromEpochDate(item.createdAt) ?: "",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
             Spacer(Modifier.weight(1f))
-            Text(text = item.members.toString())
+            Text(text = item.participantCount.toString())
             Spacer(Modifier.width(8.dp))
             Icon(
                 painter = painterResource(id = R.drawable.ic_group_24),
@@ -66,11 +66,11 @@ private fun Preview() {
     AppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ProjectItem(
-                item = ProjectShort(
+                item = ProjectInListDto(
                     id = "123",
                     name = "Project Name",
-                    members = 14,
-                    creationDate = 2343242
+                    participantCount = 14,
+                    createdAt = 2343242
                 )
             ) {}
         }
