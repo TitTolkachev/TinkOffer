@@ -53,7 +53,16 @@ class SignInViewModel(
 
                     if (response.isSuccessful) {
                         prefsDataStore.updateTokens(response.body()?.accessToken)
-                        _navigateToHome.emit(Unit)
+                        val userAccountInfoResponse = userRestApi.getMyUserInfo()
+
+                        if (userAccountInfoResponse.isSuccessful) {
+                            userAccountInfoResponse.body()?.let {
+                                prefsDataStore.updateUserId(it.id)
+                                _navigateToHome.emit(Unit)
+                            }
+                        } else {
+                            Log.e(TAG, "токен получен, информация об аккаунте нет")
+                        }
                     } else {
                         _error.emit(response.errorBody().toString())
                     }
@@ -72,7 +81,7 @@ class SignInViewModel(
         _link.emit("http://79.174.91.149/?redirect_url=tinkoffer://sign-in")
     }
 
-    companion object{
+    companion object {
         private val TAG = SignInViewModel::class.simpleName
     }
 }

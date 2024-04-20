@@ -8,6 +8,10 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.tinkoff.tinkoffer.data.local.PrefsDataStore
+import ru.tinkoff.tinkoffer.data.rest.CommentRestApi
+import ru.tinkoff.tinkoffer.data.rest.DraftRestApi
+import ru.tinkoff.tinkoffer.data.rest.ProjectRestApi
+import ru.tinkoff.tinkoffer.data.rest.ProposalRestApi
 import ru.tinkoff.tinkoffer.data.rest.UserRestApi
 import ru.tinkoff.tinkoffer.data.utils.TokenInterceptor
 import ru.tinkoff.tinkoffer.presentation.MainViewModel
@@ -31,11 +35,11 @@ val appModule = module {
     // ViewModel
     viewModel { MainViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get()) }
-    viewModel { HomeViewModel() }
+    viewModel { HomeViewModel(get(),get(),get(),get(),get(),get(),) }
     viewModel { ProfileViewModel() }
     viewModel { ProjectSettingsViewModel() }
     viewModel { ProposalViewModel() }
-    viewModel { ProjectListViewModel() }
+    viewModel { ProjectListViewModel(get()) }
     viewModel { CreateProjectViewModel() }
 
 
@@ -74,6 +78,8 @@ val appModule = module {
     }
 
     single { get<Retrofit>().create(UserRestApi::class.java) }
-
-
+    single { get<Retrofit>().create(ProposalRestApi::class.java) }
+    single { get<Retrofit>().create(DraftRestApi::class.java) }
+    single { get<Retrofit>().create(CommentRestApi::class.java) }
+    single { get<Retrofit>().create(ProjectRestApi::class.java) }
 }

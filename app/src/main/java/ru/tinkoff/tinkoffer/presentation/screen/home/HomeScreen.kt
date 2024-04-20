@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInfoDto
+import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.presentation.common.InputField
 import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
@@ -67,7 +69,9 @@ fun HomeScreen(
     val selectedIndex by viewModel.selectedIndex.collectAsState()
 
     // Data on screen
-    val projectInfo by viewModel.projectInfo.collectAsState()
+    val userId by viewModel.userId.collectAsState()
+    val activeProjectInfo by viewModel.activeProjectInfo.collectAsState()
+    val proposalsForActiveProject by viewModel.proposalsForActiveProject.collectAsState()
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect {
@@ -136,7 +140,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SelectProjectElement(
-                    projectInfo = projectInfo,
+                    projectInfo = activeProjectInfo,
                     onChangeProjectClick = navigateToProjectList,
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -171,7 +175,9 @@ fun HomeScreen(
         Screen(
             modifier = Modifier.padding(paddingValues),
             pagerState = pagerState,
-
+            userId = userId ?: "",
+            activeProjectInfoDto = activeProjectInfo,
+            proposalsForActiveProject = proposalsForActiveProject,
             navigateToProjectSettings = navigateToProjectSettings,
             navigateToProposal = navigateToProposal,
         )
@@ -183,7 +189,9 @@ fun HomeScreen(
 private fun Screen(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
-
+    userId: String,
+    activeProjectInfoDto: ProjectInfoDto?,
+    proposalsForActiveProject: List<ProposalInListDto>,
     navigateToProjectSettings: () -> Unit,
     navigateToProposal: (ProposalShort) -> Unit,
 ) {
@@ -197,6 +205,10 @@ private fun Screen(
                 ProjectPage(
                     admin = true,
                     navigateToProjectSettings = navigateToProjectSettings,
+                    activeProjectInfoDto = activeProjectInfoDto,
+                    countOfProposals = proposalsForActiveProject.size,
+                    voteAvailable = activeProjectInfoDto?.users?.firstOrNull { it.id == userId }?.availableVotes?.toInt()
+                        ?: 0,
                 )
             }
 

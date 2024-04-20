@@ -32,14 +32,28 @@ class PrefsDataStore(private val context: Context) {
         }
     }
 
+    suspend fun updateUserId(newId: String? = null) {
+        context.dataStore.edit { prefs ->
+            newId?.let {
+                prefs[USER_ID] = newId
+            }
+        }
+    }
+
     val tokenFlow = context.dataStore.data.map { prefs ->
         prefs[ACCESS_TOKEN] ?: ""
+    }
+
+    val userIdFlow = context.dataStore.data.map { prefs ->
+        prefs[USER_ID] ?: ""
     }
 
     companion object {
         private val KEY = intPreferencesKey("key")
 
         private val ACCESS_TOKEN = stringPreferencesKey("access_token")
+
+        private val USER_ID = stringPreferencesKey("user_id")
 
     }
 }

@@ -29,6 +29,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
+import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInfoDto
 import ru.tinkoff.tinkoffer.presentation.shadowCustom
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
@@ -37,6 +38,9 @@ fun ProjectPage(
     modifier: Modifier = Modifier,
     admin: Boolean,
 
+    activeProjectInfoDto: ProjectInfoDto?,
+    countOfProposals: Int,
+    voteAvailable: Int,
     navigateToProjectSettings: () -> Unit = {},
 ) {
     Column(
@@ -75,7 +79,7 @@ fun ProjectPage(
                 Row {
                     Text(text = "Всего предложений:")
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(text = "123")
+                    Text(text = countOfProposals.toString())
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -83,7 +87,7 @@ fun ProjectPage(
                 Row {
                     Text(text = "Доступно голосов:")
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(text = "123")
+                    Text(text = voteAvailable.toString())
                 }
             }
 
@@ -160,6 +164,9 @@ private fun Preview() {
             ProjectPage(
                 modifier = Modifier,
                 admin = true,
+                activeProjectInfoDto = null,
+                countOfProposals = 100,
+                voteAvailable = 100
             )
         }
     }
