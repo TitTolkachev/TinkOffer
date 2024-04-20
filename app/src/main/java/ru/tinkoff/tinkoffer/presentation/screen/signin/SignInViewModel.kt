@@ -1,5 +1,6 @@
 package ru.tinkoff.tinkoffer.presentation.screen.signin
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,6 +43,7 @@ class SignInViewModel(
 
                 try {
                     //TODO(Отправить запрос на бэк)
+                    Log.d("TEST", "TOKEN: $_token")
                     delay(1000L)
                     _navigateToHome.emit(Unit)
                 } catch (_: Exception) {
@@ -54,6 +56,6 @@ class SignInViewModel(
     }
 
     fun onSignInClick() = viewModelScope.launch {
-        _link.emit("http://77.106.105.103:8089/")
+        _link.emit("http://79.174.91.149/?redirect_url=tinkoffer://sign-in")
     }
 }

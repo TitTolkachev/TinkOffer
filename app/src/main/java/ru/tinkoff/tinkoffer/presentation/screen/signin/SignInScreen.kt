@@ -94,7 +94,7 @@ fun SignInScreen(navigateToHome: () -> Unit) {
             openCustomTab(
                 context,
                 customIntent.build(),
-                Uri.parse("https://indorsoft.ru")
+                Uri.parse(it)
             )
         }
     }
