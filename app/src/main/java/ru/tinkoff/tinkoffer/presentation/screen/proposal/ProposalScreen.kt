@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -99,7 +100,15 @@ private fun Screen(
                         )
                     }
                 },
-                title = { Text(text = "Предложение") })
+                title = {
+                    Row {
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = "Предложение",
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+                    }
+                })
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState, snackbar = {
