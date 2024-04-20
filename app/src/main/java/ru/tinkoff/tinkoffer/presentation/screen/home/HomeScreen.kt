@@ -59,7 +59,7 @@ fun HomeScreen(
     navigateToProfile: () -> Unit,
     navigateToProjectSettings: (String) -> Unit,
     navigateToProjectList: () -> Unit,
-    navigateToProposal: (ProposalInListDto) -> Unit,
+    navigateToProposal: (ProposalInListDto, projectId: String, isAdmin: Boolean) -> Unit,
     navigateToProjectUsers: () -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
@@ -185,7 +185,15 @@ fun HomeScreen(
             acceptedProposals = acceptedProposalsForActiveProject,
             rejectedProposals = rejectedProposalsForActiveProject,
             navigateToProjectSettings = navigateToProjectSettings,
-            navigateToProposal = navigateToProposal,
+            navigateToProposal = { proposal ->
+                activeProjectInfo?.id?.let {
+                    navigateToProposal(
+                        proposal,
+                        it,
+                        activeProjectInfo!!.users.firstOrNull { it.id == userId }?.isAdmin ?: false
+                    )
+                }
+            },
             likeProposal = { id -> viewModel.onLikeClick(id) },
             dislikeProposal = { id -> viewModel.onDislikeClick(id) },
             onDismissVote = { id -> viewModel.onDismissVoteClick(id) },

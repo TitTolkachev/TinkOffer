@@ -29,9 +29,8 @@ interface CommentRestApi {
         @Body createCommentDto: CreateCommentDto
     ): Response<ResponseBody>
 
-    @POST("comments/{commentId}/{proposalId}")
+    @POST("comments/proposals/{proposalId}")
     suspend fun createCommentToProposal(
-        @Path("commentId") commentId: String,
         @Path("proposalId") proposalId: String,
         @Body createCommentDto: CreateCommentDto
     ): Response<ResponseBody>
