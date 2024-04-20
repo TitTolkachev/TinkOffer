@@ -2,7 +2,7 @@ package ru.tinkoff.tinkoffer.presentation.common
 
 enum class ProposalStatus {
     NEW,
-    ACTIVE,
+    IN_PROGRESS,
     ACCEPTED,
     REJECTED,
 }

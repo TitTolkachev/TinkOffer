@@ -1,5 +1,6 @@
 package ru.tinkoff.tinkoffer.presentation.screen.projectsettings
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,6 +39,7 @@ class ProjectSettingsViewModel(
     init {
         viewModelScope.launch {
             val response = projectRestApi.getProjectInfo(projectId)
+            Log.d(TAG,response.body().toString())
             if (response.isSuccessful) {
                 response.body()?.let { currentProjectState ->
                     _state.update {
@@ -84,5 +86,9 @@ class ProjectSettingsViewModel(
             }
 
         }
+    }
+
+    companion object{
+        val TAG = ProjectSettingsViewModel::class.java.simpleName
     }
 }

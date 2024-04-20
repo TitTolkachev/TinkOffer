@@ -23,6 +23,7 @@ import ru.tinkoff.tinkoffer.data.rest.DraftRestApi
 import ru.tinkoff.tinkoffer.data.rest.ProjectRestApi
 import ru.tinkoff.tinkoffer.data.rest.ProposalRestApi
 import ru.tinkoff.tinkoffer.data.rest.UserRestApi
+import ru.tinkoff.tinkoffer.presentation.common.ProposalStatus
 
 class HomeViewModel(
     private val projectRestApi: ProjectRestApi,
@@ -58,12 +59,16 @@ class HomeViewModel(
     val activeProjectInfo =
         _activeProjectInfo.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    private val _proposalsForActiveProject = MutableStateFlow<List<ProposalInListDto>>(listOf())
-    val proposalsForActiveProject = _proposalsForActiveProject.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        listOf()
-    )
+    private val _newProposals = MutableStateFlow<List<ProposalInListDto>>(listOf())
+    private val _inProgressProposals = MutableStateFlow<List<ProposalInListDto>>(listOf())
+    private val _acceptedProposals = MutableStateFlow<List<ProposalInListDto>>(listOf())
+    private val _rejectedProposals = MutableStateFlow<List<ProposalInListDto>>(listOf())
+
+    val newProposals = _newProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    val inProgressProposals = _inProgressProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    val acceptedProposals = _acceptedProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    val rejectedProposals = _rejectedProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+
 
     private val _dialogState = MutableStateFlow<CreateProposalState?>(null)
     val dialogState = _dialogState.asStateFlow()
@@ -104,7 +109,10 @@ class HomeViewModel(
                 val proposalsResponse = projectRestApi.getProposalsByProject(it)
                 if (proposalsResponse.isSuccessful) {
                     proposalsResponse.body()?.let { proposals ->
-                        _proposalsForActiveProject.emit(proposals)
+                        _newProposals.emit(proposals.filter { item -> item.proposalStatus == ProposalStatus.NEW })
+                        _inProgressProposals.emit(proposals.filter { item -> item.proposalStatus == ProposalStatus.IN_PROGRESS })
+                        _acceptedProposals.emit(proposals.filter { item -> item.proposalStatus == ProposalStatus.ACCEPTED })
+                        _rejectedProposals.emit(proposals.filter { item -> item.proposalStatus == ProposalStatus.REJECTED })
                     }
                 } else {
                     // TODO show snack

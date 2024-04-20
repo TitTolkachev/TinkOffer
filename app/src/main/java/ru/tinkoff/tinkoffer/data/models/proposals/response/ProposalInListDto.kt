@@ -13,5 +13,5 @@ data class ProposalInListDto(
     val votesFor: Long,
     val votesAgainst: Long,
     val proposalStatus: ProposalStatus,
-    val createdAt: String
+    val createdAt: Long
 )

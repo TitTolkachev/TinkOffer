@@ -8,15 +8,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
-import ru.tinkoff.tinkoffer.presentation.common.proposals
+import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.ProposalElement
 
 @Composable
 fun ActiveProposalsPage(
     modifier: Modifier = Modifier,
-
-    onProposalClick: (ProposalShort) -> Unit,
+    proposals: List<ProposalInListDto>,
+    onProposalClick: (ProposalInListDto) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -24,7 +23,7 @@ fun ActiveProposalsPage(
         verticalArrangement = spacedBy(8.dp),
     ) {
         items(items = proposals, key = { it.id }) { item ->
-            ProposalElement(item, onClick = { onProposalClick(item) })
+            ProposalElement(item, showVoteButtons = true, onClick = { onProposalClick(item) })
         }
     }
 }
