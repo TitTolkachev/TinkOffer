@@ -43,7 +43,7 @@ fun ProposalElement(item: ProposalShort, onClick: () -> Unit = {}) {
                 color = MaterialTheme.colorScheme.error,
             )
             Text(
-                text = "/",
+                text = " / ",
             )
             Text(
                 text = item.likes.toString(),
