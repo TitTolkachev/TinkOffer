@@ -44,6 +44,7 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.pages.RejectedProposalsPage
 fun HomeScreen(
     navigateToProfile: () -> Unit,
     navigateToProjectSettings: () -> Unit,
+    navigateToProjectList: () -> Unit,
     navigateToProposal: (ProposalShort) -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
@@ -69,10 +70,9 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SelectProjectElement(
-                    projectInfo,
-                ){
-                    // TODO navigation to select project
-                }
+                    projectInfo = projectInfo,
+                    onChangeProjectClick = navigateToProjectList,
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = navigateToProfile) {
                     Image(
