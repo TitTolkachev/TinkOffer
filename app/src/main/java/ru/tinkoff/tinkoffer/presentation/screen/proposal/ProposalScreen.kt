@@ -1,4 +1,4 @@
-package ru.tinkoff.tinkoffer.presentation.screen.projectsettings
+package ru.tinkoff.tinkoffer.presentation.screen.proposal
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
@@ -31,8 +31,8 @@ import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
-fun ProjectSettingsScreen(navigateBack: () -> Unit) {
-    val viewModel: ProjectSettingsViewModel = koinViewModel()
+fun ProposalScreen(navigateBack: () -> Unit) {
+    val viewModel: ProposalViewModel = koinViewModel()
     val shackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -69,7 +69,7 @@ private fun Screen(
                         )
                     }
                 },
-                title = { Text(text = "Настройки проекта") })
+                title = { Text(text = "Предложение") })
         },
         snackbarHost = {
             SnackbarHost(hostState = shackBarHostState, snackbar = {

@@ -26,6 +26,8 @@ import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 fun ProjectPage(
     modifier: Modifier = Modifier,
     admin: Boolean,
+
+    navigateToProjectSettings: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -37,7 +39,7 @@ fun ProjectPage(
             if (admin) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = navigateToProjectSettings) {
                         Icon(
                             imageVector = Icons.Rounded.Settings,
                             contentDescription = null,

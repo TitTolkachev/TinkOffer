@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import ru.tinkoff.tinkoffer.presentation.common.ProposalShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.BottomNavBar
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.Fab
@@ -42,6 +43,8 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.pages.RejectedProposalsPage
 @Composable
 fun HomeScreen(
     navigateToProfile: () -> Unit,
+    navigateToProjectSettings: () -> Unit,
+    navigateToProposal: (ProposalShort) -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val fabVisible by viewModel.fabVisible.collectAsState()
@@ -93,7 +96,10 @@ fun HomeScreen(
     ) { paddingValues ->
         Screen(
             modifier = Modifier.padding(paddingValues),
-            pagerState = pagerState
+            pagerState = pagerState,
+
+            navigateToProjectSettings = navigateToProjectSettings,
+            navigateToProposal = navigateToProposal,
         )
     }
 }
@@ -103,6 +109,9 @@ fun HomeScreen(
 private fun Screen(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
+
+    navigateToProjectSettings: () -> Unit,
+    navigateToProposal: (ProposalShort) -> Unit,
 ) {
     HorizontalPager(
         modifier = modifier,
@@ -113,6 +122,7 @@ private fun Screen(
             0 -> {
                 ProjectPage(
                     admin = true,
+                    navigateToProjectSettings = navigateToProjectSettings,
                 )
             }
 
@@ -121,7 +131,9 @@ private fun Screen(
             }
 
             2 -> {
-                ActiveProposalsPage()
+                ActiveProposalsPage(
+                    onProposalClick = navigateToProposal
+                )
             }
 
             3 -> {

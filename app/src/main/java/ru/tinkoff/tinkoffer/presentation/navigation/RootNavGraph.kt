@@ -17,6 +17,8 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import ru.tinkoff.tinkoffer.presentation.screen.home.HomeScreen
 import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileScreen
+import ru.tinkoff.tinkoffer.presentation.screen.projectsettings.ProjectSettingsScreen
+import ru.tinkoff.tinkoffer.presentation.screen.proposal.ProposalScreen
 import ru.tinkoff.tinkoffer.presentation.screen.signin.SignInScreen
 
 @Composable
@@ -42,7 +44,17 @@ fun RootNavGraph(
                     navController.navigate(route = Screen.Profile.route) {
                         launchSingleTop = true
                     }
-                }
+                },
+                navigateToProjectSettings = {
+                    navController.navigate(route = Screen.ProjectSettings.route) {
+                        launchSingleTop = true
+                    }
+                },
+                navigateToProposal = {
+                    navController.navigate(route = Screen.Proposal.route) {
+                        launchSingleTop = true
+                    }
+                },
             )
         }
         composable(
@@ -80,6 +92,28 @@ fun RootNavGraph(
             popExitTransition = { popExitTransition() },
         ) {
             ProfileScreen(
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = Screen.ProjectSettings.route,
+            enterTransition = { enterTransition() },
+            popEnterTransition = { popEnterTransition() },
+            exitTransition = { exitTransition() },
+            popExitTransition = { popExitTransition() },
+        ) {
+            ProjectSettingsScreen(
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = Screen.Proposal.route,
+            enterTransition = { enterTransition() },
+            popEnterTransition = { popEnterTransition() },
+            exitTransition = { exitTransition() },
+            popExitTransition = { popExitTransition() },
+        ) {
+            ProposalScreen(
                 navigateBack = { navController.popBackStack() }
             )
         }
