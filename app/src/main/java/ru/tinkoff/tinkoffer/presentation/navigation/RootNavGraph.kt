@@ -57,8 +57,8 @@ fun RootNavGraph(
                         launchSingleTop = true
                     }
                 },
-                navigateToProposal = {
-                    navController.navigate(route = Screen.Proposal.route) {
+                navigateToProposal = { proposal, projectId, isAdmin ->
+                    navController.navigate(route = Screen.Proposal.route + "/${proposal.id}/${projectId}/$isAdmin") {
                         launchSingleTop = true
                     }
                 },
@@ -148,11 +148,26 @@ fun RootNavGraph(
             )
         }
         composable(
-            route = Screen.Proposal.route,
+            route = Screen.Proposal.route + "/{proposal_id}/{project_id}/{is_admin}",
             enterTransition = { enterTransition() },
             popEnterTransition = { popEnterTransition() },
             exitTransition = { exitTransition() },
             popExitTransition = { popExitTransition() },
+            arguments = listOf(
+                navArgument("proposal_id") {
+                    type = NavType.StringType
+                    nullable = false
+                },
+                navArgument("project_id") {
+                    type = NavType.StringType
+                    nullable = false
+                },
+                navArgument("is_admin") {
+                    type = NavType.BoolType
+                    nullable = false
+                },
+
+                )
         ) {
             ProposalScreen(
                 navigateBack = { navController.popBackStack() }

@@ -16,5 +16,5 @@ data class ProposalInfoDto(
     val jiraLink: String,
     val canBeVoteCanceled: Boolean,
     val comments: List<CommentDto>,
-    val createdAt: String,
+    val createdAt: Long,
 )

@@ -3,6 +3,7 @@ package ru.tinkoff.tinkoffer.presentation.screen.proposal
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +39,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +52,9 @@ import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.R
 import ru.tinkoff.tinkoffer.data.models.proposals.response.CommentDto
+import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
+import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInfoDto
+import ru.tinkoff.tinkoffer.data.models.users.response.UserDto
 import ru.tinkoff.tinkoffer.data.models.users.response.UserInfoDto
 import ru.tinkoff.tinkoffer.presentation.common.Proposal
 import ru.tinkoff.tinkoffer.presentation.common.ProposalStatus
@@ -62,6 +69,11 @@ import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 fun ProposalScreen(navigateBack: () -> Unit) {
     val viewModel: ProposalViewModel = koinViewModel()
     val shackBarHostState = remember { SnackbarHostState() }
+
+    val state by viewModel.state.collectAsState()
+    val parentOfComment by viewModel.parentOfComment.collectAsState()
+    val commentValue by viewModel.comment.collectAsState()
+
 
     LaunchedEffect(Unit) {
         viewModel.navigateBack.collect {
@@ -87,24 +99,36 @@ fun ProposalScreen(navigateBack: () -> Unit) {
         canBeVoiceCanceled = false,
     )
 
-    Screen(
-        item = proposal,
-        comments = comments.flatMap { listOf(it, it, it) },
-        snackbarHostState = shackBarHostState,
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        state?.let {
+            Screen(
+                item = it,
+                snackbarHostState = shackBarHostState,
 
-        onBackClick = remember { { viewModel.navigateBack() } },
-    )
+                onBackClick = remember { { viewModel.navigateBack() } },
+                onLike = viewModel::onLikeClick,
+                onDislike = viewModel::onDislikeClick,
+                onCancelVote = viewModel::onDismissVoteClick,
+                onChangeStatus = viewModel::changeStatus
+            )
+        } ?: CircularProgressIndicator()
+
+    }
+
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Screen(
-    item: Proposal,
-    comments: List<CommentDto>,
+    item: CombinedProposal,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
+    onChangeStatus: (ProposalStatus) -> Unit,
+    
     onLike: () -> Unit = {},
     onDislike: () -> Unit = {},
+    onCancelVote: () -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {
     Scaffold(
@@ -167,13 +191,13 @@ private fun Screen(
                     Row(modifier = Modifier.padding(horizontal = 8.dp)) {
                         Text(
                             modifier = Modifier.weight(1f),
-                            text = item.text
+                            text = item.infoDto.text
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                StatusBlock()
+                StatusBlock(currentStatus = item.infoDto.proposalStatus, onClick = onChangeStatus)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
@@ -198,26 +222,32 @@ private fun Screen(
                     Spacer(Modifier.weight(1f))
 
                     Text(
-                        text = "-${item.badUsers.count()}",
+                        text = "-${item.inListData.votesAgainst}",
                         color = if (isSystemInDarkTheme()) Color.White else Color(0xFF3F3F3F),
                     )
                     Text(
                         text = " | ",
                     )
                     Text(
-                        text = "+${item.goodUsers.count()}",
+                        text = "+${item.inListData.votesFor}",
                         color = if (isSystemInDarkTheme()) Color(0xFFFEDD2D) else Color(0xFF4A87F8),
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    IconButton(onClick = onLike) {
+                    IconButton(onClick = {
+                        if (item.inListData.userVote == true) {
+                            onCancelVote()
+                        } else {
+                            onLike()
+                        }
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_thumb_up),
                             contentDescription = null,
-                            tint = if (item.userVoice == true && isSystemInDarkTheme()) {
+                            tint = if (item.inListData.userVote == true && isSystemInDarkTheme()) {
                                 Color(0xFFFEDD2D)
-                            } else if (item.userVoice == true && !isSystemInDarkTheme()) {
+                            } else if (item.inListData.userVote == true && !isSystemInDarkTheme()) {
                                 Color(0xFF4A87F8)
                             } else if (isSystemInDarkTheme()) {
                                 Color.White
@@ -227,13 +257,19 @@ private fun Screen(
                         )
                     }
 
-                    IconButton(onClick = onDislike) {
+                    IconButton(onClick = {
+                        if (item.inListData.userVote == true) {
+                            onCancelVote()
+                        } else {
+                            onDislike()
+                        }
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_thumb_down),
                             contentDescription = null,
-                            tint = if (item.userVoice == false && isSystemInDarkTheme()) {
+                            tint = if (item.inListData.userVote == false && isSystemInDarkTheme()) {
                                 Color(0xFFFEDD2D)
-                            } else if (item.userVoice == false && !isSystemInDarkTheme()) {
+                            } else if (item.inListData.userVote == false && !isSystemInDarkTheme()) {
                                 Color(0xFF4A87F8)
                             } else if (isSystemInDarkTheme()) {
                                 Color.White
@@ -260,7 +296,10 @@ private fun Screen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun StatusBlock() {
+private fun StatusBlock(
+    currentStatus: ProposalStatus = ProposalStatus.ACCEPTED,
+    onClick: (ProposalStatus) -> Unit = {}
+) {
     SingleChoiceSegmentedButtonRow(
         modifier = if (!isSystemInDarkTheme()) Modifier.shadowCustom(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -269,8 +308,8 @@ private fun StatusBlock() {
         ) else Modifier
     ) {
         SegmentedButton(
-            selected = false,
-            onClick = { /*TODO*/ },
+            selected = currentStatus == ProposalStatus.NEW,
+            onClick = { onClick(ProposalStatus.NEW) },
             colors = SegmentedButtonDefaults.colors(
                 activeContainerColor = MaterialTheme.colorScheme.primary,
                 activeContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -280,8 +319,8 @@ private fun StatusBlock() {
             Text(text = "New")
         }
         SegmentedButton(
-            selected = false,
-            onClick = { /*TODO*/ },
+            selected = currentStatus == ProposalStatus.IN_PROGRESS,
+            onClick = { onClick(ProposalStatus.IN_PROGRESS) },
             colors = SegmentedButtonDefaults.colors(
                 activeContainerColor = MaterialTheme.colorScheme.primary,
                 activeContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -291,8 +330,8 @@ private fun StatusBlock() {
             Text(text = "Active")
         }
         SegmentedButton(
-            selected = true,
-            onClick = { /*TODO*/ },
+            selected = currentStatus == ProposalStatus.ACCEPTED,
+            onClick = { onClick(ProposalStatus.ACCEPTED) },
             colors = SegmentedButtonDefaults.colors(
                 activeContainerColor = MaterialTheme.colorScheme.primary,
                 activeContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -302,8 +341,8 @@ private fun StatusBlock() {
             Text(text = "Accepted")
         }
         SegmentedButton(
-            selected = false,
-            onClick = { /*TODO*/ },
+            selected = currentStatus == ProposalStatus.REJECTED,
+            onClick = { onClick(ProposalStatus.REJECTED) },
             colors = SegmentedButtonDefaults.colors(
                 activeContainerColor = MaterialTheme.colorScheme.primary,
                 activeContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -459,28 +498,66 @@ private fun Preview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             val snackbarHostState = remember { SnackbarHostState() }
 
-            val proposal = Proposal(
-                id = "123",
-                text = "dsfsfsdfsdf",
-                author = UserShort(
-                    id = "UserId",
-                    avatar = 1,
-                    nickname = "Nickname"
+
+            val prop = CombinedProposal(
+                infoDto = ProposalInfoDto(
+                    id = "123",
+                    text = "dsfsfsdfsdf",
+                    user = UserInfoDto(
+                        id = "12",
+                        firstName = "Egor",
+                        lastName = "Шамов",
+                        middleName = "name",
+                        phone = "134234",
+                        avatarNumber = 2
+                    ),
+                    proposalStatus = ProposalStatus.REJECTED,
+                    userVote = null,
+                    canVote = true,
+                    jiraLink = "http://asdasd",
+                    canBeVoteCanceled = true,
+                    comments = comments,
+                    createdAt = 1241221312,
                 ),
-                status = ProposalStatus.NEW,
-                userVoice = null,
-                goodUsers = listOf(),
-                badUsers = listOf(),
-                voiceEnabled = true,
-                link = "http://asdasd",
-                draftComment = "AdAsDsD",
-                canBeVoiceCanceled = false,
+                inListData = ProposalInListDto(
+                    id = "123",
+                    text = " asasdsads",
+                    user = UserDto(
+                        id = "0",
+                        avatarNumber = 1,
+                        firstName = "Егор",
+                        lastName = "Шамов"
+                    ),
+                    userVote = null,
+                    votesFor = 123,
+                    votesAgainst = 33,
+                    proposalStatus = ProposalStatus.REJECTED,
+                    createdAt = 1241221312,
+                )
             )
+
+//            val proposal = Proposal(
+//                id = "123",
+//                text = "dsfsfsdfsdf",
+//                author = UserShort(
+//                    id = "UserId",
+//                    avatar = 1,
+//                    nickname = "Nickname"
+//                ),
+//                status = ProposalStatus.NEW,
+//                userVoice = null,
+//                goodUsers = listOf(),
+//                badUsers = listOf(),
+//                voiceEnabled = true,
+//                link = "http://asdasd",
+//                draftComment = "AdAsDsD",
+//                canBeVoiceCanceled = false,
+//            )
             Screen(
-                item = proposal,
-                comments = comments,
+                item = prop,
                 snackbarHostState = snackbarHostState,
                 onBackClick = {},
+                onChangeStatus = {}
             )
         }
     }
