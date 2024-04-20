@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.tinkoff.tinkoffer.data.models.comments.request.CreateCommentDto
 import ru.tinkoff.tinkoffer.data.models.proposals.request.ChangeProposalStatus
 import ru.tinkoff.tinkoffer.data.models.proposals.request.VoteRequest
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
@@ -75,8 +76,15 @@ class ProposalViewModel(
     }
 
     fun selectParentOfComment(parentCommentId: String) {
-        viewModelScope.launch {
-            _parentOfComment.emit(parentCommentId)
+        if (parentCommentId == _parentOfComment.value){
+            _commentValue.update { "" }
+            _parentOfComment.update { "" }
+            _newComment.update { true }
+
+        } else{
+            _parentOfComment.update { parentCommentId }
+            _newComment.update { true }
+
         }
     }
 
@@ -95,11 +103,33 @@ class ProposalViewModel(
     fun sendComment() {
         viewModelScope.launch {
             if (_newComment.value) {
-                // new comment
+                if (_parentOfComment.value.isNullOrBlank()){
+                    if (_commentValue.value?.isNotEmpty() == true){
+                        val model = CreateCommentDto(_commentValue.value!!)
+                        commentRestApi.createCommentToProposal(proposalId, model)
+                        clearTexts()
+                        // todo check
+                        loadInfo()
+                    }
+                } else{
+                    if (_commentValue.value?.isNotEmpty() == true){
+                        val model = CreateCommentDto(_commentValue.value!!)
+                        commentRestApi.createCommentToComment(_parentOfComment.value!!, model)
+                        clearTexts()
+                        // todo check
+                        loadInfo()
+                    }
+                }
             } else {
+                // todo
                 // edit
             }
         }
+    }
+    private fun clearTexts(){
+        _commentValue.update { "" }
+        _parentOfComment.update { "" }
+        _newComment.update { true }
     }
 
     fun changeStatus(newStatus: ProposalStatus) {

@@ -2,6 +2,7 @@ package ru.tinkoff.tinkoffer.presentation.screen.proposal
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -109,7 +110,12 @@ fun ProposalScreen(navigateBack: () -> Unit) {
                 onLike = viewModel::onLikeClick,
                 onDislike = viewModel::onDislikeClick,
                 onCancelVote = viewModel::onDismissVoteClick,
-                onChangeStatus = viewModel::changeStatus
+                onChangeStatus = viewModel::changeStatus,
+                comment = commentValue ?: "",
+                onCommentChanged = { viewModel.onChangeCommentText(it) },
+                onSendComment = { viewModel.sendComment() },
+                onSelectParent = { viewModel.selectParentOfComment(it) },
+                currentParent = parentOfComment ?: "",
             )
         } ?: CircularProgressIndicator()
 
@@ -122,10 +128,16 @@ fun ProposalScreen(navigateBack: () -> Unit) {
 @Composable
 private fun Screen(
     item: CombinedProposal,
+    comment: String,
+    onCommentChanged: (String) -> Unit,
+    onSendComment: () -> Unit,
+    onSelectParent: (String) -> Unit,
+    currentParent: String,
+
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
     onChangeStatus: (ProposalStatus) -> Unit,
-    
+
     onLike: () -> Unit = {},
     onDislike: () -> Unit = {},
     onCancelVote: () -> Unit = {},
@@ -282,13 +294,17 @@ private fun Screen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Comments(items = comments)
+                Comments(
+                    items = item.infoDto.comments,
+                    currentParent = currentParent,
+                    onSelectParent = onSelectParent
+                )
             }
 
             Input(
-                value = "",
-                onValueChange = {},
-                sendComment = {},
+                value = comment,
+                onValueChange = onCommentChanged,
+                sendComment = onSendComment,
             )
         }
     }
@@ -357,6 +373,8 @@ private fun StatusBlock(
 @Composable
 private fun Comments(
     items: List<CommentDto>,
+    currentParent: String,
+    onSelectParent: (String) -> Unit
 ) {
     if (items.isNotEmpty()) {
         Column(Modifier.fillMaxWidth()) {
@@ -377,6 +395,9 @@ private fun Comments(
                         avatar = it.user.avatarNumber,
                         nickname = it.user.firstName,
                         comment = it.text,
+                        commentId = it.id,
+                        currentParent = currentParent,
+                        onSelectParent = onSelectParent,
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -394,7 +415,10 @@ private fun Comments(
 private fun Comment(
     avatar: Int,
     nickname: String,
+    commentId: String,
     comment: String,
+    currentParent: String,
+    onSelectParent: (String) -> Unit
 ) {
     Icon(
         modifier = Modifier
@@ -412,9 +436,11 @@ private fun Comment(
         )
         Text(text = comment)
         TextButton(
-            modifier = Modifier.align(Alignment.Start),
+            modifier = Modifier
+                .align(Alignment.Start)
+                .border(1.dp, if (commentId == currentParent) Color.Yellow else Color.Transparent),
             colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF928F8F)),
-            onClick = { /*TODO*/ }
+            onClick = { onSelectParent(commentId) }
         ) {
             Text(text = "ответить")
         }
@@ -557,7 +583,12 @@ private fun Preview() {
                 item = prop,
                 snackbarHostState = snackbarHostState,
                 onBackClick = {},
-                onChangeStatus = {}
+                onChangeStatus = {},
+                comment = "",
+                onCommentChanged = {},
+                onSendComment = {},
+                onSelectParent = {},
+                currentParent = "",
             )
         }
     }
