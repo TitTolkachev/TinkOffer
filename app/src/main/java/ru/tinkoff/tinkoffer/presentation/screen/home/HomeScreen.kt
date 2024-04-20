@@ -185,6 +185,9 @@ fun HomeScreen(
             rejectedProposals = rejectedProposalsForActiveProject,
             navigateToProjectSettings = navigateToProjectSettings,
             navigateToProposal = navigateToProposal,
+            likeProposal = { id -> viewModel.onLikeClick(id) },
+            dislikeProposal = { id -> viewModel.onDislikeClick(id) },
+            onDismissVote = { id -> viewModel.onDismissVoteClick(id) }
         )
     }
 }
@@ -202,6 +205,9 @@ private fun Screen(
     rejectedProposals: List<ProposalInListDto>,
     navigateToProjectSettings: (String) -> Unit,
     navigateToProposal: (ProposalInListDto) -> Unit,
+    likeProposal: (id: String) -> Unit,
+    dislikeProposal: (id: String) -> Unit,
+    onDismissVote: (id: String) -> Unit,
 ) {
     HorizontalPager(
         modifier = modifier,
@@ -227,14 +233,20 @@ private fun Screen(
             1 -> {
                 NewProposalsPage(
                     proposals = newProposals,
-                    onProposalClick = navigateToProposal
+                    onProposalClick = navigateToProposal,
+                    onLike = likeProposal,
+                    onDislike = dislikeProposal,
+                    onCancel = onDismissVote
                 )
             }
 
             2 -> {
                 ActiveProposalsPage(
                     proposals = inProgressProposals,
-                    onProposalClick = navigateToProposal
+                    onProposalClick = navigateToProposal,
+                    onLike = likeProposal,
+                    onDislike = dislikeProposal,
+                    onCancel = onDismissVote
                 )
             }
 

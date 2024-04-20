@@ -16,6 +16,10 @@ fun NewProposalsPage(
     modifier: Modifier = Modifier,
     proposals: List<ProposalInListDto>,
     onProposalClick: (ProposalInListDto) -> Unit,
+    onLike: (id: String) -> Unit,
+    onDislike: (id: String) -> Unit,
+    onCancel: (id: String) -> Unit
+
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -23,7 +27,15 @@ fun NewProposalsPage(
         verticalArrangement = Arrangement.Absolute.spacedBy(8.dp),
     ) {
         items(items = proposals, key = { it.id }) { item ->
-            ProposalElement(item, showVoteButtons = true, onClick = { onProposalClick(item) })
+            ProposalElement(
+                item,
+                showVoteButtons = true,
+                onClick = { onProposalClick(item) },
+                onLike = { onLike(item.id) },
+                onDislike = { onDislike(item.id) },
+                onCancel = { onCancel(item.id) }
+
+            )
         }
     }
 }

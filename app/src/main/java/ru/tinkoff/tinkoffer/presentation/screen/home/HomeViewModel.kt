@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import ru.tinkoff.tinkoffer.data.local.PrefsDataStore
 import ru.tinkoff.tinkoffer.data.models.projects.response.ProjectInfoDto
 import ru.tinkoff.tinkoffer.data.models.proposals.request.CreateProposalRequest
+import ru.tinkoff.tinkoffer.data.models.proposals.request.VoteRequest
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.data.rest.CommentRestApi
 import ru.tinkoff.tinkoffer.data.rest.DraftRestApi
@@ -64,10 +65,14 @@ class HomeViewModel(
     private val _acceptedProposals = MutableStateFlow<List<ProposalInListDto>>(listOf())
     private val _rejectedProposals = MutableStateFlow<List<ProposalInListDto>>(listOf())
 
-    val newProposals = _newProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
-    val inProgressProposals = _inProgressProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
-    val acceptedProposals = _acceptedProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
-    val rejectedProposals = _rejectedProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    val newProposals =
+        _newProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    val inProgressProposals =
+        _inProgressProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    val acceptedProposals =
+        _acceptedProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    val rejectedProposals =
+        _rejectedProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
 
 
     private val _dialogState = MutableStateFlow<CreateProposalState?>(null)
@@ -151,6 +156,41 @@ class HomeViewModel(
 
                     }
                 }
+            }
+        }
+    }
+
+    fun onLikeClick(proposalId: String) {
+        viewModelScope.launch {
+            val model = VoteRequest(true)
+            val response = proposalRestApi.voteForProposal(proposalId, model)
+            if (response.isSuccessful){
+                loadProposalsForActiveProject()
+            } else{
+                // TODO show snack
+            }
+        }
+    }
+
+    fun onDislikeClick(proposalId: String) {
+        viewModelScope.launch {
+            val model = VoteRequest(false)
+            val response = proposalRestApi.voteForProposal(proposalId, model)
+            if (response.isSuccessful){
+                loadProposalsForActiveProject()
+            } else{
+                // TODO show snack
+            }
+        }
+    }
+
+    fun onDismissVoteClick(proposalId: String){
+        viewModelScope.launch {
+            val response = proposalRestApi.cancelVoteForProposal(proposalId)
+            if (response.isSuccessful){
+                loadProposalsForActiveProject()
+            } else{
+                // TODO show snack
             }
         }
     }

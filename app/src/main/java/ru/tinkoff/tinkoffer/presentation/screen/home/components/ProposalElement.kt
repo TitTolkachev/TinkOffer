@@ -41,6 +41,7 @@ fun ProposalElement(
     onClick: () -> Unit = {},
     onLike: () -> Unit = {},
     onDislike: () -> Unit = {},
+    onCancel: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -89,8 +90,14 @@ fun ProposalElement(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            if (showVoteButtons){
-                IconButton(onClick = onLike) {
+            if (showVoteButtons) {
+                IconButton(onClick = {
+                    if (item.userVote == true) {
+                        onCancel()
+                    } else {
+                        onLike()
+                    }
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_thumb_up),
                         contentDescription = null,
@@ -106,7 +113,13 @@ fun ProposalElement(
                     )
                 }
 
-                IconButton(onClick = onDislike) {
+                IconButton(onClick = {
+                    if (item.userVote == false) {
+                        onCancel()
+                    } else {
+                        onDislike()
+                    }
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_thumb_down),
                         contentDescription = null,
