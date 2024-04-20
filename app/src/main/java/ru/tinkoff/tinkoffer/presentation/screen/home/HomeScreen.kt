@@ -60,6 +60,7 @@ fun HomeScreen(
     navigateToProjectSettings: (String) -> Unit,
     navigateToProjectList: () -> Unit,
     navigateToProposal: (ProposalInListDto) -> Unit,
+    navigateToProjectUsers: () -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val fabVisible by viewModel.fabVisible.collectAsState()
@@ -187,7 +188,8 @@ fun HomeScreen(
             navigateToProposal = navigateToProposal,
             likeProposal = { id -> viewModel.onLikeClick(id) },
             dislikeProposal = { id -> viewModel.onDislikeClick(id) },
-            onDismissVote = { id -> viewModel.onDismissVoteClick(id) }
+            onDismissVote = { id -> viewModel.onDismissVoteClick(id) },
+            navigateToProjectUsers = navigateToProjectUsers,
         )
     }
 }
@@ -208,6 +210,7 @@ private fun Screen(
     likeProposal: (id: String) -> Unit,
     dislikeProposal: (id: String) -> Unit,
     onDismissVote: (id: String) -> Unit,
+    navigateToProjectUsers: () -> Unit,
 ) {
     HorizontalPager(
         modifier = modifier,
@@ -227,6 +230,7 @@ private fun Screen(
                     countOfProposals = newProposals.size + inProgressProposals.size + acceptedProposals.size + rejectedProposals.size,
                     voteAvailable = activeProjectInfoDto?.users?.firstOrNull { it.id == userId }?.availableVotes?.toInt()
                         ?: 0,
+                    navigateToProjectUsers = navigateToProjectUsers,
                 )
             }
 

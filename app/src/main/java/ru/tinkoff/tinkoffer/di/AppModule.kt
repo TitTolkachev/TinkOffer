@@ -20,6 +20,7 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.HomeViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.projectlist.ProjectListViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.projectsettings.ProjectSettingsViewModel
+import ru.tinkoff.tinkoffer.presentation.screen.projectusers.ProjectUsersViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.proposal.ProposalViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.signin.SignInViewModel
 import java.util.concurrent.TimeUnit
@@ -35,12 +36,13 @@ val appModule = module {
     // ViewModel
     viewModel { MainViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get()) }
-    viewModel { HomeViewModel(get(),get(),get(),get(),get(),get(),) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel() }
-    viewModel { ProjectSettingsViewModel(get(),get(),) }
+    viewModel { ProjectSettingsViewModel(get(), get()) }
     viewModel { ProposalViewModel() }
     viewModel { ProjectListViewModel(get()) }
     viewModel { CreateProjectViewModel(get()) }
+    viewModel { ProjectUsersViewModel() }
 
 
     // Rest
