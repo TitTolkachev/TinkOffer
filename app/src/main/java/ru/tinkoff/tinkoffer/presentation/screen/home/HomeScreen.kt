@@ -52,6 +52,9 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val selectedIndex by viewModel.selectedIndex.collectAsState()
 
+    // Data on screen
+    val projectInfo by viewModel.projectInfo.collectAsState()
+
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect {
             viewModel.onBottomNavItemClick(it)
@@ -65,7 +68,11 @@ fun HomeScreen(
                 modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                SelectProjectElement()
+                SelectProjectElement(
+                    projectInfo,
+                ){
+                    // TODO navigation to select project
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = navigateToProfile) {
                     Image(

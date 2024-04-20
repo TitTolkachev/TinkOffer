@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.tinkoff.tinkoffer.data.models.ShortProjectInfo
 
 class HomeViewModel : ViewModel() {
     private val _selectedIndex: MutableStateFlow<Int> = MutableStateFlow(0)
@@ -32,6 +33,9 @@ class HomeViewModel : ViewModel() {
         viewModelScope,
         SharingStarted.WhileSubscribed()
     )
+
+    private val _projectInfo = MutableStateFlow<ShortProjectInfo?>(null)
+    val projectInfo = _projectInfo.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     fun onBottomNavItemClick(index: Int) {
         _selectedIndex.update { index }
