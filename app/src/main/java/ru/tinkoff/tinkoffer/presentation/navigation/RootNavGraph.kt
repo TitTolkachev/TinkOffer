@@ -110,7 +110,13 @@ fun RootNavGraph(
             popExitTransition = { popExitTransition() },
         ) {
             ProjectSettingsScreen(
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateToProject = {
+                    navController.navigate(Screen.Home.route) {
+                        launchSingleTop = true
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
             )
         }
         composable(
