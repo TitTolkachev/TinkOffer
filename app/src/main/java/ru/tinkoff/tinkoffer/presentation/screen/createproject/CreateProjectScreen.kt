@@ -155,7 +155,7 @@ private fun Screen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Частота пополнений голосов, дн")
+            Text(text = "Период пополнения голосов, дн")
             InputField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.refreshDays.toString(),

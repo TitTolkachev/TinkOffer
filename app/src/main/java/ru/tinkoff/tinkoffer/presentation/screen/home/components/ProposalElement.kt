@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,9 +57,12 @@ fun ProposalElement(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                modifier = Modifier.size(27.dp),
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(27.dp),
                 painter = painterResource(id = avatars[item.user.avatar]),
                 contentDescription = null,
+                tint = Color.Unspecified,
             )
 
             Spacer(modifier = Modifier.width(8.dp))

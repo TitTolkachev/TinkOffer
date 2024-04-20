@@ -55,6 +55,7 @@ import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.common.UserShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.screen.proposal.components.ActiveMembers
+import ru.tinkoff.tinkoffer.presentation.shadowCustom
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @Composable
@@ -151,6 +152,13 @@ private fun Screen(
 
                 Column(
                     Modifier
+                        .then(
+                            if (!isSystemInDarkTheme()) Modifier.shadowCustom(
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                blurRadius = 32.dp,
+                                shapeRadius = 16.dp,
+                            ) else Modifier
+                        )
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(8.dp)
@@ -162,10 +170,6 @@ private fun Screen(
                             text = item.text
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(text = item.toString())
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -250,7 +254,13 @@ private fun Screen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StatusBlock() {
-    SingleChoiceSegmentedButtonRow {
+    SingleChoiceSegmentedButtonRow(
+        modifier = if (!isSystemInDarkTheme()) Modifier.shadowCustom(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            blurRadius = 32.dp,
+            shapeRadius = 16.dp,
+        ) else Modifier
+    ) {
         SegmentedButton(
             selected = false,
             onClick = { /*TODO*/ },
