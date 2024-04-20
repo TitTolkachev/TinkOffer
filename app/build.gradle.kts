@@ -124,4 +124,8 @@ dependencies {
 
     // Recycler View
     implementation(libs.androidx.recyclerview)
+
+    // Charts
+    implementation(libs.mpandroidchart)
+
 }
