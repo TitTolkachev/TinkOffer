@@ -132,6 +132,7 @@ private fun ProjectPieChart(
 ) {
     AndroidView(
         modifier = Modifier
+            .padding(horizontal = 24.dp)
             .fillMaxSize(),
         factory = { context ->
             val pieChart = PieChart(context)
@@ -140,7 +141,7 @@ private fun ProjectPieChart(
             pieChart.setEntryLabelTextSize(12f)
             pieChart.setEntryLabelColor(Color.BLACK)
             pieChart.centerText = "Статистика предложений"
-            pieChart.setCenterTextSize(24f)
+            pieChart.setCenterTextSize(16f)
             pieChart.description.isEnabled = false
 
             val legend = pieChart.legend
