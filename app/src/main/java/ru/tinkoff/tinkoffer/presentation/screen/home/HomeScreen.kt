@@ -1,11 +1,17 @@
 package ru.tinkoff.tinkoffer.presentation.screen.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,11 +20,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.BottomNavBar
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.Fab
+import ru.tinkoff.tinkoffer.presentation.screen.home.components.SelectProjectElement
 import ru.tinkoff.tinkoffer.presentation.screen.home.pages.AcceptedProposalsPage
 import ru.tinkoff.tinkoffer.presentation.screen.home.pages.ActiveProposalsPage
 import ru.tinkoff.tinkoffer.presentation.screen.home.pages.NewProposalsPage
@@ -27,7 +40,9 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.pages.RejectedProposalsPage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navigateToProfile: () -> Unit,
+) {
     val viewModel: HomeViewModel = koinViewModel()
     val fabVisible by viewModel.fabVisible.collectAsState()
     val pagerState = rememberPagerState(0, 0f) { 5 }
@@ -42,6 +57,25 @@ fun HomeScreen() {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Row(
+                modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SelectProjectElement()
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = navigateToProfile) {
+                    Image(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape),
+                        painter = painterResource(id = avatars[1]),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+            }
+        },
         floatingActionButton = {
             Fab(
                 visible = fabVisible,
@@ -77,7 +111,9 @@ private fun Screen(
     ) { page ->
         when (page) {
             0 -> {
-                ProjectPage()
+                ProjectPage(
+                    admin = true,
+                )
             }
 
             1 -> {

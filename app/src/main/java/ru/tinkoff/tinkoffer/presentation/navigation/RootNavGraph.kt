@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import ru.tinkoff.tinkoffer.presentation.screen.home.HomeScreen
+import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileScreen
 import ru.tinkoff.tinkoffer.presentation.screen.signin.SignInScreen
 
 @Composable
@@ -37,7 +38,11 @@ fun RootNavGraph(
             popExitTransition = { popExitTransition() },
         ) {
             HomeScreen(
-
+                navigateToProfile = {
+                    navController.navigate(route = Screen.Profile.route) {
+                        launchSingleTop = true
+                    }
+                }
             )
         }
         composable(
@@ -65,6 +70,17 @@ fun RootNavGraph(
                         }
                     }
                 }
+            )
+        }
+        composable(
+            route = Screen.Profile.route,
+            enterTransition = { enterTransition() },
+            popEnterTransition = { popEnterTransition() },
+            exitTransition = { exitTransition() },
+            popExitTransition = { popExitTransition() },
+        ) {
+            ProfileScreen(
+                navigateBack = { navController.popBackStack() }
             )
         }
     }

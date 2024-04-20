@@ -48,7 +48,6 @@ import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarSuccess
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
-
 @Composable
 fun SignInScreen(navigateToHome: () -> Unit) {
 

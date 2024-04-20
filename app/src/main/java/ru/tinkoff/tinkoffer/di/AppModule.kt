@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import ru.tinkoff.tinkoffer.data.local.PrefsDataStore
 import ru.tinkoff.tinkoffer.presentation.MainViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.home.HomeViewModel
+import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.signin.SignInViewModel
 
 val appModule = module {
@@ -20,4 +21,5 @@ val appModule = module {
     viewModel { MainViewModel(get()) }
     viewModel { SignInViewModel(get()) }
     viewModel { HomeViewModel() }
+    viewModel { ProfileViewModel() }
 }
