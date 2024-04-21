@@ -5,6 +5,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -21,13 +22,13 @@ interface ProjectRestApi {
     suspend fun removeAdminRole(
         @Path("projectId") projectId: String,
         @Path("userId") userId: String,
-    ): ResponseBody
+    ): Response<ResponseBody>
 
     @PUT("projects/{projectId}/assign-admin-role/{userId}")
     suspend fun addAdminRole(
         @Path("projectId") projectId: String,
         @Path("userId") userId: String,
-    ): ResponseBody
+    ): Response<ResponseBody>
 
     @GET("projects/{id}")
     suspend fun getProjectInfo(
@@ -74,7 +75,7 @@ interface ProjectRestApi {
     suspend fun getActiveProject(
     ): Response<ActiveProjectDto>
 
-    @DELETE("projects/{id}/users")
+    @HTTP(method = "DELETE", hasBody = true, path = "projects/{id}/users")
     suspend fun deleteUsersFromProject(
         @Path("id") projectId: String,
         @Body listOfUsers: List<String>

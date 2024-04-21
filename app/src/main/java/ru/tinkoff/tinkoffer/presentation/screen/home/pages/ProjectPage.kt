@@ -195,7 +195,7 @@ private fun ProjectPieChart(
             pieEntries.add(PieEntry(acceptedProposalsCount.toFloat() / all, "Принятые"))
         }
         if (rejectedProposalsCount > 0) {
-            pieEntries.add(PieEntry(rejectedProposalsCount.toFloat() / all, "Отклонённые"))
+            pieEntries.add(PieEntry(rejectedProposalsCount.toFloat() / all, "Закрытые"))
         }
 
         val colors = ArrayList<Int>()

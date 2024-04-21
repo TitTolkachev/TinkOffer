@@ -11,11 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import ru.tinkoff.tinkoffer.data.models.users.response.UserDto
+import ru.tinkoff.tinkoffer.data.models.users.response.UserInfoDto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UsersBottomSheet(showBottomSheet: Boolean, users: List<UserDto>, hideBottomSheet: () -> Unit) {
+fun UsersBottomSheet(
+    showBottomSheet: Boolean,
+    users: List<UserInfoDto>,
+    hideBottomSheet: () -> Unit,
+    addUserToProject: (String) -> Unit
+) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     if (showBottomSheet) {
@@ -32,6 +37,7 @@ fun UsersBottomSheet(showBottomSheet: Boolean, users: List<UserDto>, hideBottomS
                         avatar = it.avatarNumber,
                         nickname = "${it.firstName} ${it.lastName}",
                         onClick = {
+                            addUserToProject(it.id)
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) hideBottomSheet()
                             }
