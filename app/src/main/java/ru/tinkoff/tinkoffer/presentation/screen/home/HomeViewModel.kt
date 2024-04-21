@@ -50,6 +50,12 @@ class HomeViewModel(
         SharingStarted.WhileSubscribed()
     )
 
+    private val _error = MutableSharedFlow<String?>()
+    val error = _error.shareIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed()
+    )
+
     private val _userId = MutableStateFlow<String?>(null)
     val userId = _userId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
@@ -74,7 +80,6 @@ class HomeViewModel(
     val rejectedProposals =
         _rejectedProposals.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
 
-
     private val _dialogState = MutableStateFlow<CreateProposalState?>(null)
     val dialogState = _dialogState.asStateFlow()
 
@@ -86,7 +91,7 @@ class HomeViewModel(
 
     }
 
-    private fun loadActiveProject() {
+    fun loadActiveProject() {
         viewModelScope.launch {
             val activeProjectIdResponse = projectRestApi.getActiveProject()
             Log.d(TAG, activeProjectIdResponse.body().toString())
@@ -95,15 +100,19 @@ class HomeViewModel(
                     _activeProjectId.emit(it)
                     val activeProjectInfoResponse = projectRestApi.getProjectInfo(it)
                     Log.d(TAG, activeProjectInfoResponse.body().toString())
-                    if (activeProjectIdResponse.isSuccessful) {
+                    if (activeProjectInfoResponse.isSuccessful) {
                         _activeProjectInfo.emit(activeProjectInfoResponse.body())
                         loadProposalsForActiveProject()
                     } else {
-                        // TODO show snack
+                        _error.emit(
+                            activeProjectInfoResponse.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                        )
                     }
                 }
             } else {
-                // TODO show snack
+                _error.emit(
+                    activeProjectIdResponse.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                )
             }
         }
     }
@@ -120,8 +129,9 @@ class HomeViewModel(
                         _rejectedProposals.emit(proposals.filter { item -> item.proposalStatus == ProposalStatus.REJECTED })
                     }
                 } else {
-                    // TODO show snack
-
+                    _error.emit(
+                        proposalsResponse.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                    )
                 }
             }
         }
@@ -151,9 +161,10 @@ class HomeViewModel(
                             _scrollToIndex.emit(1)
                             loadActiveProject()
                         } else {
-                            // TODO show snack
+                            _error.emit(
+                                response.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                            )
                         }
-
                     }
                 }
             }
@@ -164,10 +175,12 @@ class HomeViewModel(
         viewModelScope.launch {
             val model = VoteRequest(true)
             val response = proposalRestApi.voteForProposal(proposalId, model)
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 loadProposalsForActiveProject()
-            } else{
-                // TODO show snack
+            } else {
+                _error.emit(
+                    response.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                )
             }
         }
     }
@@ -176,21 +189,25 @@ class HomeViewModel(
         viewModelScope.launch {
             val model = VoteRequest(false)
             val response = proposalRestApi.voteForProposal(proposalId, model)
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 loadProposalsForActiveProject()
-            } else{
-                // TODO show snack
+            } else {
+                _error.emit(
+                    response.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                )
             }
         }
     }
 
-    fun onDismissVoteClick(proposalId: String){
+    fun onDismissVoteClick(proposalId: String) {
         viewModelScope.launch {
             val response = proposalRestApi.cancelVoteForProposal(proposalId)
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 loadProposalsForActiveProject()
-            } else{
-                // TODO show snack
+            } else {
+                _error.emit(
+                    response.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                )
             }
         }
     }

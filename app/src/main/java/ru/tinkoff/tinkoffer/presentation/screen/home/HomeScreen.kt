@@ -24,12 +24,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,6 +90,37 @@ fun HomeScreen(
             scope.launch {
                 pagerState.animateScrollToPage(it)
             }
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.loadActiveProject()
+    }
+
+    var errorMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+    if (!errorMessage.isNullOrBlank()) {
+        Dialog(onDismissRequest = { errorMessage = null }) {
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp)
+            ) {
+                Text(text = errorMessage ?: "Произошла ошибка")
+                TextButton(
+                    modifier = Modifier.align(Alignment.End),
+                    onClick = { errorMessage = null }) {
+                    Text(text = "Ок")
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.error.collect {
+            errorMessage = it
         }
     }
 
