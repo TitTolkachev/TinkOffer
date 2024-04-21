@@ -44,8 +44,11 @@ class ProjectUsersViewModel(
 
 
     init {
-        loadUsers()
-        loadUsersNotInProject()
+        viewModelScope.launch {
+            loadUsers()
+            loadUsersNotInProject()
+
+        }
     }
 
 

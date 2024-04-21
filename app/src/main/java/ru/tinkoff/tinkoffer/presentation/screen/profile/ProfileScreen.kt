@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.R
+import ru.tinkoff.tinkoffer.data.models.users.response.UserInfoDto
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
@@ -53,6 +55,8 @@ fun ProfileScreen(
 ) {
     val viewModel: ProfileViewModel = koinViewModel()
     val shackBarHostState = remember { SnackbarHostState() }
+
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.navigateBack.collect {
@@ -69,7 +73,7 @@ fun ProfileScreen(
     Screen(
         shackBarHostState = shackBarHostState,
 
-        avatar = 12,//TODO()
+        avatar = state,
 
         saveAvatar = remember { { viewModel.save(it) } },
         logout = remember { { viewModel.logout() } },
@@ -83,7 +87,7 @@ fun ProfileScreen(
 private fun Screen(
     shackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
-    avatar: Int,
+    avatar: UserInfoDto?,
 
     saveAvatar: (Int) -> Unit = {},
     logout: () -> Unit = {},
@@ -122,8 +126,8 @@ private fun Screen(
         }
     ) { paddingValues ->
 
-        var selectedAvatar by remember {
-            mutableIntStateOf(avatar)
+        var selectedAvatar by remember(avatar?.avatarNumber) {
+            mutableIntStateOf(avatar?.avatarNumber ?: 12)
         }
 
         Column(
@@ -212,7 +216,7 @@ private fun Preview() {
     AppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             Screen(
-                avatar = 12,
+                avatar = null,
             )
         }
     }

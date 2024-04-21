@@ -64,10 +64,8 @@ import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInfoDto
 import ru.tinkoff.tinkoffer.data.models.users.response.UserDto
 import ru.tinkoff.tinkoffer.data.models.users.response.UserInfoDto
-import ru.tinkoff.tinkoffer.presentation.common.Proposal
 import ru.tinkoff.tinkoffer.presentation.common.ProposalStatus
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
-import ru.tinkoff.tinkoffer.presentation.common.UserShort
 import ru.tinkoff.tinkoffer.presentation.common.avatars
 import ru.tinkoff.tinkoffer.presentation.screen.proposal.components.ActiveMembers
 import ru.tinkoff.tinkoffer.presentation.shadowCustom
@@ -82,6 +80,8 @@ fun ProposalScreen(navigateBack: () -> Unit) {
     val parentOfComment by viewModel.parentOfComment.collectAsState()
     val commentValue by viewModel.comment.collectAsState()
 
+    val users by viewModel.activeUserInProposal.collectAsState()
+
 
     LaunchedEffect(Unit) {
         viewModel.navigateBack.collect {
@@ -89,29 +89,31 @@ fun ProposalScreen(navigateBack: () -> Unit) {
         }
     }
 
-    val proposal = Proposal(
-        id = "123",
-        text = "dsfsfsdfsdf",
-        author = UserShort(
-            id = "UserId",
-            avatar = 1,
-            nickname = "Nickname"
-        ),
-        status = ProposalStatus.NEW,
-        userVoice = null,
-        goodUsers = listOf(),
-        badUsers = listOf(),
-        voiceEnabled = true,
-        link = "http://asdasd",
-        draftComment = "AdAsDsD",
-        canBeVoiceCanceled = false,
-    )
+//    val proposal = Proposal(
+//        id = "123",
+//        text = "dsfsfsdfsdf",
+//        author = UserShort(
+//            id = "UserId",
+//            avatar = 1,
+//            nickname = "Nickname"
+//        ),
+//        status = ProposalStatus.NEW,
+//        userVoice = null,
+//        goodUsers = listOf(),
+//        badUsers = listOf(),
+//        voiceEnabled = true,
+//        link = "http://asdasd",
+//        draftComment = "AdAsDsD",
+//        canBeVoiceCanceled = false,
+//    )
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         state?.let {
             Screen(
                 item = it,
                 snackbarHostState = shackBarHostState,
+
+                users = users,
 
                 onBackClick = remember { { viewModel.navigateBack() } },
                 onLike = viewModel::onLikeClick,
@@ -141,6 +143,7 @@ private fun Screen(
     onSelectParent: (String) -> Unit,
     currentParent: String,
 
+    users: List<UserInfoDto>,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
     onChangeStatus: (ProposalStatus) -> Unit,
@@ -239,9 +242,18 @@ private fun Screen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Spacer(Modifier.width(8.dp))
+
+
+                    val icons = mutableListOf<Int>()
+                    for (i in 0..<3) {
+                        if (users.getOrNull(i) != null){
+                            icons.add(users[i].avatarNumber)
+                        }
+                    }
+
                     ActiveMembers(
-                        memberIcons = listOf(1, 2, 3),
-                        remainingPeople = 123,
+                        memberIcons = icons,
+                        remainingPeople = users.size - 3,
                     )
 
                     Spacer(Modifier.weight(1f))
@@ -769,6 +781,8 @@ private fun Preview() {
                     canBeVoteCanceled = true,
                     comments = comments,
                     createdAt = 1241221312,
+                    usersVotedAgainst = listOf(),
+                    usersVotedFor = listOf()
                 ),
                 inListData = ProposalInListDto(
                     id = "123",
@@ -814,6 +828,7 @@ private fun Preview() {
                 onSendComment = {},
                 onSelectParent = {},
                 currentParent = "",
+                users = listOf()
             )
         }
     }

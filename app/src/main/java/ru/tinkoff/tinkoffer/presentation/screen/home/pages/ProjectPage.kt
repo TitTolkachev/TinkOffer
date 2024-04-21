@@ -220,13 +220,19 @@ private fun ProjectPieChart(
         }
 
         val colors = ArrayList<Int>()
-        for (color in ColorTemplate.MATERIAL_COLORS) {
-            colors.add(color)
-        }
 
-        for (color in ColorTemplate.VORDIPLOM_COLORS) {
-            colors.add(color)
-        }
+        colors.add(ColorTemplate.rgb("#FFE456"))
+        colors.add(ColorTemplate.rgb("#928F8F"))
+        colors.add(ColorTemplate.rgb("#518EFF"))
+        colors.add(ColorTemplate.rgb("#3772CB"))
+
+//        for (color in ColorTemplate.MATERIAL_COLORS) {
+//            colors.add(color)
+//        }
+
+//        for (color in ColorTemplate.VORDIPLOM_COLORS) {
+//            colors.add(color)
+//        }
 
         val pieDataset = PieDataSet(pieEntries, "Вклад в проект")
         pieDataset.colors = colors

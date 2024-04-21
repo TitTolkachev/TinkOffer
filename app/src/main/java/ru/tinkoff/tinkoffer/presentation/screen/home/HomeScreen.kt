@@ -75,6 +75,7 @@ fun HomeScreen(
 
     // Data on screen
     val userId by viewModel.userId.collectAsState()
+    val userAvatar by viewModel.userAvatar.collectAsState()
     val activeProjectInfo by viewModel.activeProjectInfo.collectAsState()
     val newProposalsForActiveProject by viewModel.newProposals.collectAsState()
     val inProgressProposalsForActiveProject by viewModel.inProgressProposals.collectAsState()
@@ -189,7 +190,7 @@ fun HomeScreen(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape),
-                        painter = painterResource(id = avatars[1]),
+                        painter = painterResource(id = avatars[userAvatar]),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                     )
