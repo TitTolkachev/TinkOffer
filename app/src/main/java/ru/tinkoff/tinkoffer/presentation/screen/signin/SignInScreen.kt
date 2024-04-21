@@ -143,7 +143,7 @@ private fun Screen(
                 modifier = Modifier
                     .aspectRatio(1f)
                     .weight(2f),
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.ic_logo_with_text),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )

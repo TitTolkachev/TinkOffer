@@ -14,32 +14,31 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.R
 import ru.tinkoff.tinkoffer.data.models.users.response.UserDto
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.Fab
 import ru.tinkoff.tinkoffer.presentation.screen.projectusers.components.UserBlock
+import ru.tinkoff.tinkoffer.presentation.screen.projectusers.components.UsersBottomSheet
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,31 +55,23 @@ fun ProjectUsersScreen(
         }
     }
 
-    val scope = rememberCoroutineScope()
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        skipHiddenState = false
+    val users = listOf(
+        UserDto("1", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("2", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("3", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("4", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("5", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("6", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("7", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("8", "FirstName", "LastName", "mName", "943820348", 12),
+        UserDto("9", "FirstName", "LastName", "mName", "943820348", 12),
     )
-    ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = {
-            scope.launch {
-                sheetState.hide()
-            }
-        }
-    ) {
-        listOf(
-            UserDto("1", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("2", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("3", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("4", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("5", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("6", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("7", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("8", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("9", "FirstName", "LastName", "mName", "943820348", 12),
-        )
-    }
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+    UsersBottomSheet(
+        showBottomSheet = showBottomSheet,
+        users = users,
+        hideBottomSheet = { showBottomSheet = false })
 
     Screen(
         items = listOf(
@@ -91,7 +82,7 @@ fun ProjectUsersScreen(
         loading = viewModel.loading.collectAsState().value,
         shackBarHostState = shackBarHostState,
 
-        onFabClick = { scope.launch { sheetState.partialExpand() } },
+        onFabClick = { showBottomSheet = true },
         onBackClick = remember { { viewModel.navigateBack() } },
     )
 }
