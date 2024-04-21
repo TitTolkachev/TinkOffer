@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.R
 import ru.tinkoff.tinkoffer.data.models.proposals.response.CommentDto
@@ -106,6 +107,35 @@ fun ProposalScreen(navigateBack: () -> Unit) {
 //        draftComment = "AdAsDsD",
 //        canBeVoiceCanceled = false,
 //    )
+
+
+    var errorMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+    if (!errorMessage.isNullOrBlank()) {
+        Dialog(onDismissRequest = { errorMessage = null }) {
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp)
+            ) {
+                Text(text = errorMessage ?: "Произошла ошибка")
+                TextButton(
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                    modifier = Modifier.align(Alignment.End),
+                    onClick = { errorMessage = null }) {
+                    Text(text = "Ок")
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.error.collect {
+            errorMessage = it
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         state?.let {
@@ -246,7 +276,7 @@ private fun Screen(
 
                     val icons = mutableListOf<Int>()
                     for (i in 0..<3) {
-                        if (users.getOrNull(i) != null){
+                        if (users.getOrNull(i) != null) {
                             icons.add(users[i].avatarNumber)
                         }
                     }
@@ -411,7 +441,7 @@ private fun Comments(
 
     LaunchedEffect(key1 = scrollToLast) {
         if (scrollToLast)
-            state.animateScrollToItem(items.lastIndex)
+            state.animateScrollToItem(if (items.lastIndex == -1) 0 else items.lastIndex)
     }
 
     if (items.isNotEmpty()) {

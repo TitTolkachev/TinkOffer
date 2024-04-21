@@ -32,6 +32,12 @@ class ProposalViewModel(
     private val projectId: String = requireNotNull(savedStateHandle["project_id"])
     private val isAdmin: Boolean = requireNotNull(savedStateHandle["is_admin"])
 
+    private val _error = MutableSharedFlow<String?>()
+    val error = _error.shareIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed()
+    )
+
     private val _state = MutableStateFlow<CombinedProposal?>(null)
     val state = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
@@ -58,27 +64,34 @@ class ProposalViewModel(
     private fun loadInfo() {
         viewModelScope.launch {
 
-                val response = proposalRestApi.getProposalById(proposalId)
-                if (response.isSuccessful) {
-                    response.body()?.let { infoDto ->
-                        _activeUserInProposal.emit(infoDto.usersVotedFor + infoDto.usersVotedAgainst)
+            val response = proposalRestApi.getProposalById(proposalId)
+            if (response.isSuccessful) {
+                response.body()?.let { infoDto ->
+                    _activeUserInProposal.emit(infoDto.usersVotedFor + infoDto.usersVotedAgainst)
 
-                        val nextResponse = projectRestApi.getProposalsByProject(projectId)
-                        if (nextResponse.isSuccessful) {
-                            nextResponse.body()?.let { inListInfos ->
-                                _state.emit(
-                                    CombinedProposal(
-                                        infoDto,
-                                        inListInfos.first { it.id == infoDto.id })
-                                )
+                    val nextResponse = projectRestApi.getProposalsByProject(projectId)
+                    if (nextResponse.isSuccessful) {
+                        nextResponse.body()?.let { inListInfos ->
+                            _state.emit(
+                                CombinedProposal(
+                                    infoDto,
+                                    inListInfos.first { it.id == infoDto.id })
+                            )
 
-                            }
                         }
-
+                    } else {
+                        _error.emit(
+                            nextResponse.errorBody()?.string()?.substringAfter("[\"")
+                                ?.substringBefore("\"]")
+                        )
                     }
-                } else {
-                    // TODO show snack
+
                 }
+            } else {
+                _error.emit(
+                    response.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                )
+            }
 
         }
     }
@@ -149,11 +162,13 @@ class ProposalViewModel(
                 if (response.isSuccessful) {
                     loadInfo()
                 } else {
-                    // TODO show snack
+                    _error.emit(
+                        response.errorBody()?.string()?.substringAfter("[\"")
+                            ?.substringBefore("\"]")
+                    )
                 }
             }
         }
-
     }
 
 
@@ -165,7 +180,10 @@ class ProposalViewModel(
                 if (response.isSuccessful) {
                     loadInfo()
                 } else {
-                    // TODO show snack
+                    _error.emit(
+                        response.errorBody()?.string()?.substringAfter("[\"")
+                            ?.substringBefore("\"]")
+                    )
                 }
             }
         }
@@ -179,7 +197,10 @@ class ProposalViewModel(
                 if (response.isSuccessful) {
                     loadInfo()
                 } else {
-                    // TODO show snack
+                    _error.emit(
+                        response.errorBody()?.string()?.substringAfter("[\"")
+                            ?.substringBefore("\"]")
+                    )
                 }
             }
         }
@@ -194,7 +215,10 @@ class ProposalViewModel(
                 if (response.isSuccessful) {
                     loadInfo()
                 } else {
-                    // TODO show snack
+                    _error.emit(
+                        response.errorBody()?.string()?.substringAfter("[\"")
+                            ?.substringBefore("\"]")
+                    )
                 }
             }
         }
