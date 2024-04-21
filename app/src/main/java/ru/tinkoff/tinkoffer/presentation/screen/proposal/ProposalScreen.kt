@@ -1,8 +1,11 @@
 package ru.tinkoff.tinkoffer.presentation.screen.proposal
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +18,12 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material3.ButtonDefaults
@@ -42,7 +47,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -143,6 +150,12 @@ private fun Screen(
     onCancelVote: () -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {
+
+    var scrollToLast by remember {
+        mutableStateOf(false)
+    }
+
+
     Scaffold(
         modifier = Modifier
             .imePadding()
@@ -180,8 +193,8 @@ private fun Screen(
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
+                    .padding(horizontal = 16.dp),
+//                    .verticalScroll(rememberScrollState())
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -270,7 +283,7 @@ private fun Screen(
                     }
 
                     IconButton(onClick = {
-                        if (item.inListData.userVote == true) {
+                        if (item.inListData.userVote == false) {
                             onCancelVote()
                         } else {
                             onDislike()
@@ -295,13 +308,16 @@ private fun Screen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Comments(
+                    scrollToLast = scrollToLast,
+                    modifier = Modifier.weight(1f),
                     items = item.infoDto.comments,
-                    currentParent = currentParent,
+                     currentParent = currentParent,
                     onSelectParent = onSelectParent
                 )
             }
 
             Input(
+                {state -> scrollToLast = state},
                 value = comment,
                 onValueChange = onCommentChanged,
                 sendComment = onSendComment,
@@ -370,28 +386,43 @@ private fun StatusBlock(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Comments(
+    scrollToLast: Boolean,
+    modifier: Modifier,
     items: List<CommentDto>,
     currentParent: String,
     onSelectParent: (String) -> Unit
 ) {
-    if (items.isNotEmpty()) {
-        Column(Modifier.fillMaxWidth()) {
-            Text(
-                modifier = Modifier.align(Alignment.Start),
-                text = "Комментарии",
-                style = MaterialTheme.typography.titleLarge
-            )
+    val state = rememberLazyListState()
 
-            Spacer(modifier = Modifier.height(16.dp))
+    LaunchedEffect(key1 = scrollToLast) {
+        if (scrollToLast)
+            state.animateScrollToItem(items.lastIndex )
+    }
+
+    if (items.isNotEmpty()) {
+        LazyColumn(
+            state = state,
+            userScrollEnabled = true,
+            modifier = modifier
+                .wrapContentHeight(align = Alignment.Top)
+                .fillMaxWidth()
+        ) {
+            item {
+                Text(
+                    text = "Комментарии",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             items.forEach {
-                Row {
-                    if (it.proposalId.isBlank())
-                        Spacer(modifier = Modifier.width(24.dp))
-
+                item {
                     Comment(
+                        modifier = Modifier.animateItemPlacement(),
                         avatar = it.user.avatarNumber,
                         nickname = it.user.firstName,
                         comment = it.text,
@@ -400,19 +431,171 @@ private fun Comments(
                         onSelectParent = onSelectParent,
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                it.replies.forEach { firstLevelComment ->
+                    item {
+                        Comment(
+                            modifier = Modifier
+                                .animateItemPlacement()
+                                .padding(start = 36.dp),
+                            avatar = firstLevelComment.user.avatarNumber,
+                            nickname = firstLevelComment.user.firstName,
+                            comment = firstLevelComment.text,
+                            commentId = firstLevelComment.id,
+                            currentParent = currentParent,
+                            onSelectParent = onSelectParent,
+                        )
+                    }
+
+                    firstLevelComment.replies.forEach { secondLevelComment ->
+                        item {
+                            Comment(
+                                modifier = Modifier
+                                    .animateItemPlacement()
+                                    .padding(start = (36 * 2).dp),
+                                avatar = secondLevelComment.user.avatarNumber,
+                                nickname = secondLevelComment.user.firstName,
+                                comment = secondLevelComment.text,
+                                commentId = secondLevelComment.id,
+                                currentParent = currentParent,
+                                onSelectParent = onSelectParent,
+                            )
+                        }
+
+                        secondLevelComment.replies.forEach { thirdLevelComment ->
+                            item {
+                                Comment(
+                                    modifier = Modifier
+                                        .animateItemPlacement()
+                                        .padding(start = (36 * 3).dp),
+                                    avatar = thirdLevelComment.user.avatarNumber,
+                                    nickname = thirdLevelComment.user.firstName,
+                                    comment = thirdLevelComment.text,
+                                    commentId = thirdLevelComment.id,
+                                    currentParent = currentParent,
+                                    onSelectParent = onSelectParent,
+                                )
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+        }
+
+//            items(items) {
+//                Comment(
+//                    modifier = Modifier.animateItemPlacement(),
+//                    avatar = it.user.avatarNumber,
+//                    nickname = it.user.firstName,
+//                    comment = it.text,
+//                    commentId = it.id,
+//                    currentParent = currentParent,
+//                    onSelectParent = onSelectParent,
+//                )
+//
+////                    Spacer(modifier = Modifier.width(36.dp))
+////                    Column {
+//                        RecursiveComment(
+//                            modifier = Modifier.animateItemPlacement().padding(36.dp),
+//                            it.replies,
+//                            currentParent,
+//                            onSelectParent
+//                        )
+////                    }
+//            }
+//    }
+//} else {
+//    Text(
+//        text = "Комментарии отсутствуют",
+//        style = MaterialTheme.typography.bodyLarge
+//    )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+fun Recusia(
+    modifier: Modifier,
+    lazyScope: LazyListScope,
+    comment: CommentDto,
+    currentParent: String,
+    onSelectParent: (String) -> Unit
+) {
+    lazyScope.apply {
+        item {
+            Comment(
+                modifier = modifier.animateItemPlacement(),
+                avatar = comment.user.avatarNumber,
+                nickname = comment.user.firstName,
+                comment = comment.text,
+                commentId = comment.id,
+                currentParent = currentParent,
+                onSelectParent = onSelectParent,
+            )
+        }
+        comment.replies.forEach {
+            item {
+                Recusia(
+                    modifier = modifier,
+                    lazyScope = lazyScope,
+                    comment = it,
+                    currentParent = currentParent,
+                    onSelectParent = onSelectParent,
+                )
             }
         }
-    } else {
-        Text(
-            text = "Комментарии отсутствуют",
-            style = MaterialTheme.typography.bodyLarge
+
+
+    }
+}
+
+@Composable
+fun RecursiveComment(
+    modifier: Modifier = Modifier,
+    comments: List<CommentDto>,
+    currentParent: String,
+    onSelectParent: (String) -> Unit
+) {
+    comments.forEach { comment ->
+        Comment(
+            modifier = modifier,
+            avatar = comment.user.avatarNumber,
+            nickname = comment.user.firstName,
+            comment = comment.text,
+            commentId = comment.id,
+            currentParent = currentParent,
+            onSelectParent = onSelectParent,
         )
+
+        comment.replies.forEach {
+            Comment(
+                modifier = modifier,
+                avatar = it.user.avatarNumber,
+                nickname = it.user.firstName,
+                comment = it.text,
+                commentId = it.id,
+                currentParent = currentParent,
+                onSelectParent = onSelectParent,
+            )
+            RecursiveComment(
+                modifier = modifier,
+                comments = it.replies,
+                currentParent = currentParent,
+                onSelectParent
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+
     }
 }
 
 @Composable
 private fun Comment(
+    modifier: Modifier = Modifier,
     avatar: Int,
     nickname: String,
     commentId: String,
@@ -420,43 +603,61 @@ private fun Comment(
     currentParent: String,
     onSelectParent: (String) -> Unit
 ) {
-    Icon(
-        modifier = Modifier
-            .clip(CircleShape)
-            .size(40.dp),
-        painter = painterResource(id = avatars[avatar]),
-        contentDescription = null,
-        tint = Color.Unspecified,
-    )
-    Spacer(modifier = Modifier.width(8.dp))
-    Column {
-        Text(
-            text = nickname,
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(text = comment)
-        TextButton(
+    Column(modifier = modifier) {
+        Icon(
             modifier = Modifier
-                .align(Alignment.Start)
-                .border(1.dp, if (commentId == currentParent) Color.Yellow else Color.Transparent),
-            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF928F8F)),
-            onClick = { onSelectParent(commentId) }
-        ) {
-            Text(text = "ответить")
+                .clip(CircleShape)
+                .size(40.dp),
+            painter = painterResource(id = avatars[avatar]),
+            contentDescription = null,
+            tint = Color.Unspecified,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(
+                text = nickname,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(text = comment)
+            TextButton(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .align(Alignment.Start)
+                    .border(
+                        1.dp,
+                        if (commentId == currentParent) Color.Black else Color.Transparent,
+                        CircleShape
+                    ),
+                colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF928F8F)),
+                onClick = { onSelectParent(commentId) }
+            ) {
+                Text(text = "ответить")
+            }
         }
     }
+
 }
 
 @Composable
 private fun Input(
+    click: (Boolean) -> Unit,
     value: String,
     onValueChange: (String) -> Unit,
     sendComment: () -> Unit,
 ) {
+    val source = remember {
+        MutableInteractionSource()
+    }
+    val state = source.collectIsPressedAsState()
+    if (state.value){
+        click(state.value)
+    }
+
     Row {
         TextField(
             modifier = Modifier.weight(1f),
             value = value,
+            interactionSource = source,
             onValueChange = onValueChange
         )
 
@@ -483,7 +684,8 @@ val comments = listOf(
         ),
         proposalId = "1",
         parentCommentId = "",
-        createdAt = 1241315235
+        createdAt = 1241315235,
+        replies = listOf()
     ),
     CommentDto(
         id = "123",
@@ -498,7 +700,27 @@ val comments = listOf(
         ),
         proposalId = "",
         parentCommentId = "",
-        createdAt = 1241315235
+        createdAt = 1241315235,
+        replies = listOf(
+            CommentDto(
+                id = "123",
+                text = "AADAsDASdasdasdasSdAADAsDASdasdasdasSdAADAsDASdasdasdasSd",
+                user = UserInfoDto(
+                    id = "12",
+                    firstName = "Egor",
+                    lastName = "Шамов",
+                    middleName = "name",
+                    phone = "134234",
+                    avatarNumber = 2
+                ),
+                proposalId = "",
+                parentCommentId = "",
+                createdAt = 1241315235,
+                replies = listOf()
+
+            )
+        )
+
     ),
     CommentDto(
         id = "123",
@@ -513,7 +735,9 @@ val comments = listOf(
         ),
         proposalId = "",
         parentCommentId = "",
-        createdAt = 1241315235
+        createdAt = 1241315235,
+        replies = listOf()
+
     ),
 )
 
@@ -523,7 +747,6 @@ private fun Preview() {
     AppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             val snackbarHostState = remember { SnackbarHostState() }
-
 
             val prop = CombinedProposal(
                 infoDto = ProposalInfoDto(

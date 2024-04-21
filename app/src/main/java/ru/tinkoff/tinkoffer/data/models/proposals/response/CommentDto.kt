@@ -12,4 +12,5 @@ data class CommentDto(
     val proposalId: String,
     val parentCommentId: String,
     val createdAt: Long,
+    val replies: List<CommentDto>
 )
