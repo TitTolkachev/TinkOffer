@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import ru.tinkoff.tinkoffer.presentation.screen.createproject.CreateProjectScreen
+import ru.tinkoff.tinkoffer.presentation.screen.drafts.DraftsScreen
 import ru.tinkoff.tinkoffer.presentation.screen.home.HomeScreen
 import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileScreen
 import ru.tinkoff.tinkoffer.presentation.screen.projectlist.ProjectListScreen
@@ -65,6 +66,11 @@ fun RootNavGraph(
                 },
                 navigateToProjectUsers = { projectId, userId ->
                     navController.navigate(route = Screen.ProjectUsers.route + "/$projectId/$userId") {
+                        launchSingleTop = true
+                    }
+                },
+                navigateToDrafts = {
+                    navController.navigate(route = Screen.Drafts.route) {
                         launchSingleTop = true
                     }
                 },
@@ -217,9 +223,21 @@ fun RootNavGraph(
                     type = NavType.StringType
                     nullable = false
                 },
-                )
+            )
         ) {
             ProjectUsersScreen(
+                navigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = Screen.Drafts.route,
+            enterTransition = { enterTransition() },
+            popEnterTransition = { popEnterTransition() },
+            exitTransition = { exitTransition() },
+            popExitTransition = { popExitTransition() },
+            arguments = listOf()
+        ) {
+            DraftsScreen(
                 navigateBack = { navController.popBackStack() },
             )
         }

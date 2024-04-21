@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Settings
@@ -50,12 +48,9 @@ fun ProjectPage(
     voteAvailable: Int,
     navigateToProjectSettings: (String) -> Unit = {},
     navigateToProjectUsers: () -> Unit = {},
+    navigateToDrafts: () -> Unit = {},
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
+    Column(modifier = modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(16.dp))
         Card(
             modifier = Modifier
@@ -135,6 +130,33 @@ fun ProjectPage(
             }
         }
 
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .then(
+                    if (!isSystemInDarkTheme()) Modifier.shadowCustom(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        blurRadius = 32.dp,
+                        shapeRadius = 16.dp,
+                    ) else Modifier
+                ),
+            onClick = navigateToDrafts,
+        ) {
+            if (admin) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Черновики")
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Box(
@@ -148,7 +170,6 @@ fun ProjectPage(
                 acceptedProposalsCount = acceptedProposalsCount,
                 rejectedProposalsCount = rejectedProposalsCount,
             )
-
         }
     }
 }

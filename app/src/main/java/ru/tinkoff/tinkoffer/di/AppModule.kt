@@ -16,6 +16,7 @@ import ru.tinkoff.tinkoffer.data.rest.UserRestApi
 import ru.tinkoff.tinkoffer.data.utils.TokenInterceptor
 import ru.tinkoff.tinkoffer.presentation.MainViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.createproject.CreateProjectViewModel
+import ru.tinkoff.tinkoffer.presentation.screen.drafts.DraftsViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.home.HomeViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileViewModel
 import ru.tinkoff.tinkoffer.presentation.screen.projectlist.ProjectListViewModel
@@ -39,10 +40,11 @@ val appModule = module {
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel() }
     viewModel { ProjectSettingsViewModel(get(), get()) }
-    viewModel { ProposalViewModel(get(),get(),get(),get(),) }
+    viewModel { ProposalViewModel(get(), get(), get(), get()) }
     viewModel { ProjectListViewModel(get()) }
     viewModel { CreateProjectViewModel(get()) }
-    viewModel { ProjectUsersViewModel(get(),get(),get(),) }
+    viewModel { ProjectUsersViewModel(get(), get(), get()) }
+    viewModel { DraftsViewModel(get(), get()) }
 
 
     // Rest
