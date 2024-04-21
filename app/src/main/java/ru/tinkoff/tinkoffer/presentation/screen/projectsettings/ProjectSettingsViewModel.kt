@@ -39,7 +39,7 @@ class ProjectSettingsViewModel(
     init {
         viewModelScope.launch {
             val response = projectRestApi.getProjectInfo(projectId)
-            Log.d(TAG,response.body().toString())
+            Log.d(TAG, response.body().toString())
             if (response.isSuccessful) {
                 response.body()?.let { currentProjectState ->
                     _state.update {
@@ -68,7 +68,7 @@ class ProjectSettingsViewModel(
         _navigateBack.emit(Unit)
     }
 
-    fun create() = viewModelScope.launch {
+    fun edit() = viewModelScope.launch {
         if (_loading.value) return@launch
 
         _loading.update { true }
@@ -88,7 +88,30 @@ class ProjectSettingsViewModel(
         }
     }
 
-    companion object{
+    fun deleteProject() = viewModelScope.launch {
+        if (_loading.value) return@launch
+
+        _loading.update { true }
+
+        viewModelScope.launch {
+
+            // TODO(Здесь добавить удаление проекта)
+
+            with(state.value) {
+                val editModel = EditProjectDto(name, schedule, voices, refreshDays)
+                val response = projectRestApi.editProject(projectId, editModel)
+                if (response.isSuccessful) {
+                    _navigateToProject.emit(Unit)
+                    _loading.update { false }
+                } else {
+                    // TOdo show snack
+                }
+            }
+
+        }
+    }
+
+    companion object {
         val TAG = ProjectSettingsViewModel::class.java.simpleName
     }
 }

@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -73,7 +75,8 @@ fun ProjectSettingsScreen(
         changeSchedule = remember { { viewModel.changeSchedule(it) } },
         changeVoices = remember { { viewModel.changeVoices(it.toIntOrNull() ?: 0) } },
         changeRefreshDays = remember { { viewModel.changeRefreshDays(it.toIntOrNull() ?: 0) } },
-        create = remember { { viewModel.create() } },
+        create = remember { { viewModel.edit() } },
+        deleteProject = remember { { viewModel.deleteProject() } },
         onBackClick = remember { { viewModel.navigateBack() } },
     )
 }
@@ -91,6 +94,7 @@ private fun Screen(
     changeVoices: (String) -> Unit = {},
     changeRefreshDays: (String) -> Unit = {},
     create: () -> Unit = {},
+    deleteProject: () -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {
     Scaffold(
@@ -178,6 +182,21 @@ private fun Screen(
                 Spacer(modifier = Modifier.height(16.dp))
                 CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
             }
+
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = deleteProject,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ),
+            ) {
+                Text(text = "Удалить")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
