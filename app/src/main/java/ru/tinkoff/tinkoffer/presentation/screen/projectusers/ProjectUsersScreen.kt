@@ -41,7 +41,6 @@ import ru.tinkoff.tinkoffer.presentation.screen.projectusers.components.UserBloc
 import ru.tinkoff.tinkoffer.presentation.screen.projectusers.components.UsersBottomSheet
 import ru.tinkoff.tinkoffer.presentation.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectUsersScreen(
     navigateBack: () -> Unit,
