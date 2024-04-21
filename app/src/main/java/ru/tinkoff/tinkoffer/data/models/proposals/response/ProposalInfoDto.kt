@@ -12,6 +12,8 @@ data class ProposalInfoDto(
     val user: UserInfoDto,
     val proposalStatus: ProposalStatus,
     val userVote: Boolean?,
+    val usersVotedFor: List<UserInfoDto>,
+    val usersVotedAgainst: List<UserInfoDto>,
     val canVote: Boolean,
     val jiraLink: String,
     val canBeVoteCanceled: Boolean,

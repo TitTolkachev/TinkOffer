@@ -50,7 +50,7 @@ fun ActiveMembers(
             if (this != null) {
                 Image(
                     modifier = Modifier
-                        .offset(x = (-5).dp)
+                        .offset(x = (-10).dp)
                         .size(36.dp)
                         .clip(CircleShape)
                         .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
@@ -64,7 +64,7 @@ fun ActiveMembers(
             if (this != null) {
                 Image(
                     modifier = Modifier
-                        .offset(x = (-10).dp)
+                        .offset(x = (-20).dp)
                         .size(36.dp)
                         .clip(CircleShape)
                         .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
@@ -75,8 +75,8 @@ fun ActiveMembers(
             }
         }
         if (remainingPeople > 0) {
-            Text(text = "и ещё ")
-            Text(text = remainingPeople.toString(), fontWeight = FontWeight.Bold)
+            Text(text = "и ещё ", modifier = Modifier.offset(x = (-13).dp))
+            Text(text = remainingPeople.toString(), fontWeight = FontWeight.Bold, modifier = Modifier.offset(x = (-13).dp))
         }
     }
 }

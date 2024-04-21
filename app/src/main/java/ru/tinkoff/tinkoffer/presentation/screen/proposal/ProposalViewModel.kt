@@ -16,6 +16,7 @@ import ru.tinkoff.tinkoffer.data.models.proposals.request.ChangeProposalStatus
 import ru.tinkoff.tinkoffer.data.models.proposals.request.VoteRequest
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInfoDto
+import ru.tinkoff.tinkoffer.data.models.users.response.UserInfoDto
 import ru.tinkoff.tinkoffer.data.rest.CommentRestApi
 import ru.tinkoff.tinkoffer.data.rest.ProjectRestApi
 import ru.tinkoff.tinkoffer.data.rest.ProposalRestApi
@@ -43,6 +44,10 @@ class ProposalViewModel(
     private val _commentValue = MutableStateFlow<String?>(null)
     val comment = _commentValue.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
+    private val _activeUserInProposal = MutableStateFlow<List<UserInfoDto>>(listOf())
+    val activeUserInProposal =
+        _activeUserInProposal.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+
 
     private val _newComment = MutableStateFlow(true)
 
@@ -52,36 +57,39 @@ class ProposalViewModel(
 
     private fun loadInfo() {
         viewModelScope.launch {
-            val response = proposalRestApi.getProposalById(proposalId)
-            if (response.isSuccessful) {
-                response.body()?.let { infoDto ->
 
-                    val nextResponse = projectRestApi.getProposalsByProject(projectId)
-                    if (nextResponse.isSuccessful) {
-                        nextResponse.body()?.let { inListInfos ->
-                            _state.emit(
-                                CombinedProposal(
-                                    infoDto,
-                                    inListInfos.first { it.id == infoDto.id })
-                            )
+                val response = proposalRestApi.getProposalById(proposalId)
+                if (response.isSuccessful) {
+                    response.body()?.let { infoDto ->
+                        _activeUserInProposal.emit(infoDto.usersVotedFor + infoDto.usersVotedAgainst)
 
+                        val nextResponse = projectRestApi.getProposalsByProject(projectId)
+                        if (nextResponse.isSuccessful) {
+                            nextResponse.body()?.let { inListInfos ->
+                                _state.emit(
+                                    CombinedProposal(
+                                        infoDto,
+                                        inListInfos.first { it.id == infoDto.id })
+                                )
+
+                            }
                         }
-                    }
 
+                    }
+                } else {
+                    // TODO show snack
                 }
-            } else {
-                // TODO show snack
-            }
+
         }
     }
 
     fun selectParentOfComment(parentCommentId: String) {
-        if (parentCommentId == _parentOfComment.value){
+        if (parentCommentId == _parentOfComment.value) {
             _commentValue.update { "" }
             _parentOfComment.update { "" }
             _newComment.update { true }
 
-        } else{
+        } else {
             _parentOfComment.update { parentCommentId }
             _newComment.update { true }
 
@@ -103,16 +111,16 @@ class ProposalViewModel(
     fun sendComment() {
         viewModelScope.launch {
             if (_newComment.value) {
-                if (_parentOfComment.value.isNullOrBlank()){
-                    if (_commentValue.value?.isNotEmpty() == true){
+                if (_parentOfComment.value.isNullOrBlank()) {
+                    if (_commentValue.value?.isNotEmpty() == true) {
                         val model = CreateCommentDto(_commentValue.value!!)
                         commentRestApi.createCommentToProposal(proposalId, model)
                         clearTexts()
                         // todo check
                         loadInfo()
                     }
-                } else{
-                    if (_commentValue.value?.isNotEmpty() == true){
+                } else {
+                    if (_commentValue.value?.isNotEmpty() == true) {
                         val model = CreateCommentDto(_commentValue.value!!)
                         commentRestApi.createCommentToComment(_parentOfComment.value!!, model)
                         clearTexts()
@@ -126,14 +134,15 @@ class ProposalViewModel(
             }
         }
     }
-    private fun clearTexts(){
+
+    private fun clearTexts() {
         _commentValue.update { "" }
         _parentOfComment.update { "" }
         _newComment.update { true }
     }
 
     fun changeStatus(newStatus: ProposalStatus) {
-        if (isAdmin){
+        if (isAdmin) {
             viewModelScope.launch {
                 val model = ChangeProposalStatus(newStatus)
                 val response = proposalRestApi.changeProposalStatus(proposalId, model)
