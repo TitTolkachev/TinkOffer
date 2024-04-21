@@ -9,8 +9,8 @@
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-        <item name="windowSplashScreenBackground">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logotin2</item>
+        <item name="windowSplashScreenBackground">@color/background</item>
         <item name="postSplashScreenTheme">@style/Theme.Tinkoffer</item>
     </style>
 </resources>

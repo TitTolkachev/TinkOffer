@@ -20,6 +20,7 @@ import ru.tinkoff.tinkoffer.presentation.screen.home.HomeScreen
 import ru.tinkoff.tinkoffer.presentation.screen.profile.ProfileScreen
 import ru.tinkoff.tinkoffer.presentation.screen.projectlist.ProjectListScreen
 import ru.tinkoff.tinkoffer.presentation.screen.projectsettings.ProjectSettingsScreen
+import ru.tinkoff.tinkoffer.presentation.screen.projectusers.ProjectUsersScreen
 import ru.tinkoff.tinkoffer.presentation.screen.proposal.ProposalScreen
 import ru.tinkoff.tinkoffer.presentation.screen.signin.SignInScreen
 
@@ -59,6 +60,11 @@ fun RootNavGraph(
                 },
                 navigateToProposal = { proposal, projectId, isAdmin ->
                     navController.navigate(route = Screen.Proposal.route + "/${proposal.id}/${projectId}/$isAdmin") {
+                        launchSingleTop = true
+                    }
+                },
+                navigateToProjectUsers = {
+                    navController.navigate(route = Screen.ProjectUsers.route) {
                         launchSingleTop = true
                     }
                 },
@@ -188,6 +194,17 @@ fun RootNavGraph(
                         popUpTo(0) { inclusive = true }
                     }
                 },
+            )
+        }
+        composable(
+            route = Screen.ProjectUsers.route,
+            enterTransition = { enterTransition() },
+            popEnterTransition = { popEnterTransition() },
+            exitTransition = { exitTransition() },
+            popExitTransition = { popExitTransition() },
+        ) {
+            ProjectUsersScreen(
+                navigateBack = { navController.popBackStack() },
             )
         }
     }

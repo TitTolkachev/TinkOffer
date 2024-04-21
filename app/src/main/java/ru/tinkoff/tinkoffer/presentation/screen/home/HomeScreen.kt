@@ -20,16 +20,20 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +64,7 @@ fun HomeScreen(
     navigateToProjectSettings: (String) -> Unit,
     navigateToProjectList: () -> Unit,
     navigateToProposal: (ProposalInListDto, projectId: String, isAdmin: Boolean) -> Unit,
+    navigateToProjectUsers: () -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val fabVisible by viewModel.fabVisible.collectAsState()
@@ -86,6 +91,38 @@ fun HomeScreen(
             scope.launch {
                 pagerState.animateScrollToPage(it)
             }
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.loadActiveProject()
+    }
+
+    var errorMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+    if (!errorMessage.isNullOrBlank()) {
+        Dialog(onDismissRequest = { errorMessage = null }) {
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp)
+            ) {
+                Text(text = errorMessage ?: "Произошла ошибка")
+                TextButton(
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                    modifier = Modifier.align(Alignment.End),
+                    onClick = { errorMessage = null }) {
+                    Text(text = "Ок")
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.error.collect {
+            errorMessage = it
         }
     }
 
@@ -195,7 +232,8 @@ fun HomeScreen(
             },
             likeProposal = { id -> viewModel.onLikeClick(id) },
             dislikeProposal = { id -> viewModel.onDislikeClick(id) },
-            onDismissVote = { id -> viewModel.onDismissVoteClick(id) }
+            onDismissVote = { id -> viewModel.onDismissVoteClick(id) },
+            navigateToProjectUsers = navigateToProjectUsers,
         )
     }
 }
@@ -216,6 +254,7 @@ private fun Screen(
     likeProposal: (id: String) -> Unit,
     dislikeProposal: (id: String) -> Unit,
     onDismissVote: (id: String) -> Unit,
+    navigateToProjectUsers: () -> Unit,
 ) {
     HorizontalPager(
         modifier = modifier,
@@ -235,6 +274,7 @@ private fun Screen(
                     countOfProposals = newProposals.size + inProgressProposals.size + acceptedProposals.size + rejectedProposals.size,
                     voteAvailable = activeProjectInfoDto?.users?.firstOrNull { it.id == userId }?.availableVotes?.toInt()
                         ?: 0,
+                    navigateToProjectUsers = navigateToProjectUsers,
                 )
             }
 
