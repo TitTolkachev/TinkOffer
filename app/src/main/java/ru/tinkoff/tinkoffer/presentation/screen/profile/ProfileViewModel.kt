@@ -13,8 +13,28 @@ class ProfileViewModel : ViewModel() {
     val navigateBack: SharedFlow<Unit> = _navigateBack
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
+    private val _navigateToSignIn = MutableSharedFlow<Unit>()
+    val navigateToSignIn: SharedFlow<Unit> = _navigateToSignIn
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
     init {
 
+    }
+
+    fun logout() {
+        //TODO
+
+        viewModelScope.launch {
+            _navigateToSignIn.emit(Unit)
+        }
+    }
+
+    fun save(avatar: Int) {
+        //TODO
+
+        viewModelScope.launch {
+            _navigateBack.emit(Unit)
+        }
     }
 
     fun navigateBack() = viewModelScope.launch {

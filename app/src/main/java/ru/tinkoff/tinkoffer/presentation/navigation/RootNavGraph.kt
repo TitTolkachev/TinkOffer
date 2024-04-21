@@ -105,7 +105,13 @@ fun RootNavGraph(
             popExitTransition = { popExitTransition() },
         ) {
             ProfileScreen(
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateToSignIn = {
+                    navController.navigate(Screen.SignIn.route) {
+                        launchSingleTop = true
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
             )
         }
         composable(
