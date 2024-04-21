@@ -30,6 +30,6 @@ sealed class HomePage(val icon: Int, val darkIcon: Int, val title: String) {
     data object RejectedProposals : HomePage(
         icon = R.drawable.deny,
         darkIcon = R.drawable.deny_dark,
-        title = "Отклоненные"
+        title = "Закрытые"
     )
 }
