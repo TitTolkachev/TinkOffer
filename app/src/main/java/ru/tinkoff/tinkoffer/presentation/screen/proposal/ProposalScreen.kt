@@ -311,13 +311,13 @@ private fun Screen(
                     scrollToLast = scrollToLast,
                     modifier = Modifier.weight(1f),
                     items = item.infoDto.comments,
-                     currentParent = currentParent,
+                    currentParent = currentParent,
                     onSelectParent = onSelectParent
                 )
             }
 
             Input(
-                {state -> scrollToLast = state},
+                { state -> scrollToLast = state },
                 value = comment,
                 onValueChange = onCommentChanged,
                 sendComment = onSendComment,
@@ -399,7 +399,7 @@ private fun Comments(
 
     LaunchedEffect(key1 = scrollToLast) {
         if (scrollToLast)
-            state.animateScrollToItem(items.lastIndex )
+            state.animateScrollToItem(items.lastIndex)
     }
 
     if (items.isNotEmpty()) {
@@ -604,36 +604,40 @@ private fun Comment(
     onSelectParent: (String) -> Unit
 ) {
     Column(modifier = modifier) {
-        Icon(
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(40.dp),
-            painter = painterResource(id = avatars[avatar]),
-            contentDescription = null,
-            tint = Color.Unspecified,
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Column {
-            Text(
-                text = nickname,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(text = comment)
-            TextButton(
+        Row {
+            Icon(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .align(Alignment.Start)
-                    .border(
-                        1.dp,
-                        if (commentId == currentParent) Color.Black else Color.Transparent,
-                        CircleShape
-                    ),
-                colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF928F8F)),
-                onClick = { onSelectParent(commentId) }
-            ) {
-                Text(text = "ответить")
+                    .size(40.dp),
+                painter = painterResource(id = avatars[avatar]),
+                contentDescription = null,
+                tint = Color.Unspecified,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column {
+                Text(
+                    text = nickname,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(text = comment)
+                TextButton(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .align(Alignment.Start)
+                        .border(
+                            1.dp,
+                            if (commentId == currentParent) Color.Black else Color.Transparent,
+                            CircleShape
+                        ),
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF928F8F)),
+                    onClick = { onSelectParent(commentId) }
+                ) {
+                    Text(text = "ответить")
+                }
             }
         }
+
+
     }
 
 }
@@ -649,9 +653,7 @@ private fun Input(
         MutableInteractionSource()
     }
     val state = source.collectIsPressedAsState()
-    if (state.value){
-        click(state.value)
-    }
+    click(state.value)
 
     Row {
         TextField(

@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import ru.tinkoff.tinkoffer.R
-import ru.tinkoff.tinkoffer.data.models.users.response.UserDto
+import ru.tinkoff.tinkoffer.data.models.users.response.ProjectUserInfoDto
 import ru.tinkoff.tinkoffer.presentation.common.SnackbarError
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.Fab
 import ru.tinkoff.tinkoffer.presentation.screen.projectusers.components.UserBlock
@@ -48,41 +48,47 @@ fun ProjectUsersScreen(
     val viewModel: ProjectUsersViewModel = koinViewModel()
     val shackBarHostState = remember { SnackbarHostState() }
 
+    val usersInProject by viewModel.usersInProject.collectAsState()
+    val usersNotInProject by viewModel.usersNotInProject.collectAsState()
+
+
+
     LaunchedEffect(Unit) {
         viewModel.navigateBack.collect {
             navigateBack()
         }
     }
 
-    val users = listOf(
-        UserDto("1", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("2", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("3", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("4", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("5", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("6", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("7", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("8", "FirstName", "LastName", "mName", "943820348", 12),
-        UserDto("9", "FirstName", "LastName", "mName", "943820348", 12),
-    )
+//    val users = listOf(
+//        UserDto("1", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("2", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("3", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("4", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("5", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("6", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("7", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("8", "FirstName", "LastName", "mName", "943820348", 12),
+//        UserDto("9", "FirstName", "LastName", "mName", "943820348", 12),
+//    )
 
     var showBottomSheet by remember { mutableStateOf(false) }
     UsersBottomSheet(
         showBottomSheet = showBottomSheet,
-        users = users,
-        hideBottomSheet = { showBottomSheet = false })
+        users = usersNotInProject,
+        hideBottomSheet = { showBottomSheet = false },
+        addUserToProject = { userId -> viewModel.addUser(userId) }
+    )
 
     Screen(
-        items = listOf(
-            UserDto("1", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("2", "FirstName", "LastName", "mName", "943820348", 12),
-            UserDto("3", "FirstName", "LastName", "mName", "943820348", 12),
-        ),
+        items = usersInProject,
         loading = viewModel.loading.collectAsState().value,
         shackBarHostState = shackBarHostState,
 
         onFabClick = { showBottomSheet = true },
         onBackClick = remember { { viewModel.navigateBack() } },
+        delete = { viewModel.deleteUser(it) },
+        makeAdmin = { viewModel.upUser(it) },
+        makeNotAdmin = { viewModel.downUser(it) }
     )
 }
 
@@ -90,13 +96,16 @@ fun ProjectUsersScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Screen(
-    items: List<UserDto> = emptyList(),
+    items: List<ProjectUserInfoDto> = emptyList(),
 
     loading: Boolean,
     shackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
 
     onBackClick: () -> Unit = {},
     onFabClick: () -> Unit = {},
+    delete: (String) -> Unit,
+    makeAdmin: (String) -> Unit,
+    makeNotAdmin: (String) -> Unit
 ) {
     Scaffold(
         modifier = Modifier
@@ -139,7 +148,12 @@ private fun Screen(
         ) {
             items(items = items, key = { it.id }) {
                 UserBlock(
-                    avatar = 12, nickname = "Nickname", admin = true, {}, {}, {}
+                    avatar = it.avatarNumber,
+                    nickname = it.firstName + " " + it.lastName,
+                    admin = it.isAdmin,
+                    { delete(it.id) },
+                    { makeAdmin(it.id) },
+                    { makeNotAdmin(it.id) },
                 )
             }
         }
@@ -153,12 +167,15 @@ private fun Preview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             Screen(
                 items = listOf(
-                    UserDto("1", "FirstName", "LastName", "mName", "943820348", 12),
-                    UserDto("2", "FirstName", "LastName", "mName", "943820348", 12),
-                    UserDto("3", "FirstName", "LastName", "mName", "943820348", 12),
+//                    UserDto("1", "FirstName", "LastName", "mName", "943820348", 12),
+//                    UserDto("2", "FirstName", "LastName", "mName", "943820348", 12),
+//                    UserDto("3", "FirstName", "LastName", "mName", "943820348", 12),
 
-                    ),
+                ),
                 loading = false,
+                delete = {},
+                makeAdmin = {},
+                makeNotAdmin = {}
             )
         }
     }

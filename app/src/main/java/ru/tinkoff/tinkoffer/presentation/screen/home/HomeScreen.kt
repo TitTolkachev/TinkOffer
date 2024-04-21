@@ -64,7 +64,7 @@ fun HomeScreen(
     navigateToProjectSettings: (String) -> Unit,
     navigateToProjectList: () -> Unit,
     navigateToProposal: (ProposalInListDto, projectId: String, isAdmin: Boolean) -> Unit,
-    navigateToProjectUsers: () -> Unit,
+    navigateToProjectUsers: (projectId: String, userId: String) -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val fabVisible by viewModel.fabVisible.collectAsState()
@@ -233,7 +233,11 @@ fun HomeScreen(
             likeProposal = { id -> viewModel.onLikeClick(id) },
             dislikeProposal = { id -> viewModel.onDislikeClick(id) },
             onDismissVote = { id -> viewModel.onDismissVoteClick(id) },
-            navigateToProjectUsers = navigateToProjectUsers,
+            navigateToProjectUsers = {
+                if (activeProjectInfo?.id != null && userId != null) {
+                    navigateToProjectUsers(activeProjectInfo?.id!!, userId!!)
+                }
+            },
         )
     }
 }
