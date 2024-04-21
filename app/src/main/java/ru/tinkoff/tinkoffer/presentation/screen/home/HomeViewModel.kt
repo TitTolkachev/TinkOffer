@@ -59,6 +59,9 @@ class HomeViewModel(
     private val _userId = MutableStateFlow<String?>(null)
     val userId = _userId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
+    private val _userAvatar = MutableStateFlow(12)
+    val userAvatar = _userAvatar.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 12)
+
 
     private val _activeProjectId = MutableStateFlow<String?>(null)
 
@@ -93,27 +96,41 @@ class HomeViewModel(
 
     fun loadActiveProject() {
         viewModelScope.launch {
-            val activeProjectIdResponse = projectRestApi.getActiveProject()
-            Log.d(TAG, activeProjectIdResponse.body().toString())
-            if (activeProjectIdResponse.isSuccessful) {
-                activeProjectIdResponse.body()?.id?.let {
-                    _activeProjectId.emit(it)
-                    val activeProjectInfoResponse = projectRestApi.getProjectInfo(it)
-                    Log.d(TAG, activeProjectInfoResponse.body().toString())
-                    if (activeProjectInfoResponse.isSuccessful) {
-                        _activeProjectInfo.emit(activeProjectInfoResponse.body())
-                        loadProposalsForActiveProject()
-                    } else {
-                        _error.emit(
-                            activeProjectInfoResponse.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
-                        )
+            launch {
+                val activeProjectIdResponse = projectRestApi.getActiveProject()
+                Log.d(TAG, activeProjectIdResponse.body().toString())
+                if (activeProjectIdResponse.isSuccessful) {
+                    activeProjectIdResponse.body()?.id?.let {
+                        _activeProjectId.emit(it)
+                        val activeProjectInfoResponse = projectRestApi.getProjectInfo(it)
+                        Log.d(TAG, activeProjectInfoResponse.body().toString())
+                        if (activeProjectInfoResponse.isSuccessful) {
+                            _activeProjectInfo.emit(activeProjectInfoResponse.body())
+                            loadProposalsForActiveProject()
+                        } else {
+                            _error.emit(
+                                activeProjectInfoResponse.errorBody()?.string()
+                                    ?.substringAfter("[\"")?.substringBefore("\"]")
+                            )
+                        }
+                    }
+                } else {
+                    _error.emit(
+                        activeProjectIdResponse.errorBody()?.string()?.substringAfter("[\"")
+                            ?.substringBefore("\"]")
+                    )
+                }
+            }
+
+            launch {
+                val response = userRestApi.getMyUserInfo()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _userAvatar.emit(it.avatarNumber)
                     }
                 }
-            } else {
-                _error.emit(
-                    activeProjectIdResponse.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
-                )
             }
+
         }
     }
 
@@ -130,7 +147,8 @@ class HomeViewModel(
                     }
                 } else {
                     _error.emit(
-                        proposalsResponse.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                        proposalsResponse.errorBody()?.string()?.substringAfter("[\"")
+                            ?.substringBefore("\"]")
                     )
                 }
             }
@@ -162,7 +180,8 @@ class HomeViewModel(
                             loadActiveProject()
                         } else {
                             _error.emit(
-                                response.errorBody()?.string()?.substringAfter("[\"")?.substringBefore("\"]")
+                                response.errorBody()?.string()?.substringAfter("[\"")
+                                    ?.substringBefore("\"]")
                             )
                         }
                     }
