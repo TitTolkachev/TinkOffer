@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -160,11 +161,24 @@ fun HomeScreen(
                     placeholder = "Ссылка"
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(
+                Row(
                     modifier = Modifier.align(Alignment.End),
-                    onClick = remember { { viewModel.createProposal() } },
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Создать")
+                    TextButton(
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                        onClick = remember { { viewModel.saveDraft() } },
+                    ) {
+                        Text(text = "Сохранить")
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = remember { { viewModel.createProposal() } },
+                    ) {
+                        Text(text = "Создать")
+                    }
                 }
             }
         }

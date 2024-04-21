@@ -190,6 +190,12 @@ class HomeViewModel(
         }
     }
 
+    fun saveDraft() {
+        //TODO!!!!!!
+
+        _dialogState.update { null }
+    }
+
     fun onLikeClick(proposalId: String) {
         viewModelScope.launch {
             val model = VoteRequest(true)
