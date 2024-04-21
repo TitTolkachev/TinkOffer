@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
+import ru.tinkoff.tinkoffer.presentation.common.EmptyList
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.ProposalElement
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -19,18 +20,22 @@ fun RejectedProposalsPage(
     proposals: List<ProposalInListDto>,
     onProposalClick: (ProposalInListDto) -> Unit,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.Absolute.spacedBy(8.dp),
-    ) {
-        items(items = proposals, key = { it.id }) { item ->
-            ProposalElement(
-                modifier = Modifier.animateItemPlacement(),
-                item = item,
-                showVoteButtons = false,
-                onClick = { onProposalClick(item) }
-            )
+    if (proposals.isNotEmpty()) {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.Absolute.spacedBy(8.dp),
+        ) {
+            items(items = proposals, key = { it.id }) { item ->
+                ProposalElement(
+                    modifier = Modifier.animateItemPlacement(),
+                    item = item,
+                    showVoteButtons = false,
+                    onClick = { onProposalClick(item) }
+                )
+            }
         }
+    } else {
+        EmptyList()
     }
 }

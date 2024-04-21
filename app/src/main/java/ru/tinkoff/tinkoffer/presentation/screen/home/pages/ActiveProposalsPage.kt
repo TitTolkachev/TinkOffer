@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.tinkoff.tinkoffer.data.models.proposals.response.ProposalInListDto
+import ru.tinkoff.tinkoffer.presentation.common.EmptyList
 import ru.tinkoff.tinkoffer.presentation.screen.home.components.ProposalElement
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -22,21 +23,25 @@ fun ActiveProposalsPage(
     onDislike: (id: String) -> Unit,
     onCancel: (id: String) -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = spacedBy(8.dp),
-    ) {
-        items(items = proposals, key = { it.id }) { item ->
-            ProposalElement(
-                modifier = Modifier.animateItemPlacement(),
-                item = item,
-                showVoteButtons = true,
-                onClick = { onProposalClick(item) },
-                onLike = { onLike(item.id) },
-                onDislike = { onDislike(item.id) },
-                onCancel = { onCancel(item.id) }
-            )
+    if (proposals.isNotEmpty()) {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = spacedBy(8.dp),
+        ) {
+            items(items = proposals, key = { it.id }) { item ->
+                ProposalElement(
+                    modifier = Modifier.animateItemPlacement(),
+                    item = item,
+                    showVoteButtons = true,
+                    onClick = { onProposalClick(item) },
+                    onLike = { onLike(item.id) },
+                    onDislike = { onDislike(item.id) },
+                    onCancel = { onCancel(item.id) }
+                )
+            }
         }
+    } else {
+        EmptyList()
     }
 }
